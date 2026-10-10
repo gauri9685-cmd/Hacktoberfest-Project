@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeCampus Connect — Seller / Lender Profile</title>
+    <!-- Google Fonts matching SafeCampus Connect Theme -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;900&family=Rajdhani:wght@500;600;700&family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="marketplace.css">
+    <link rel="stylesheet" href="profile.css">
+    <style>
+        .trust-score-badge {
+            background: rgba(234, 179, 8, 0.15);
+            border: 1px solid #eab308;
+            color: #facc15;
+            font-size: 0.78rem;
+            font-weight: 800;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-family: var(--font-heading);
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .seller-contact-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+        }
+        .btn-contact-seller {
+            flex: 1;
+            background: linear-gradient(135deg, #0284c7, #00f0ff);
+            color: #0b0f19;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            transition: all var(--transition-smooth);
+        }
+        .btn-contact-seller:hover {
+            box-shadow: 0 0 25px var(--neon-blue);
+            transform: translateY(-2px);
+        }
+        .btn-email-seller {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all var(--transition-smooth);
+        }
+        .btn-email-seller:hover {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: #a855f7;
+            color: #c084fc;
+        }
+    </style>
+</head>
+<body class="marketplace-page profile-page-body">
+
+    <!-- Cyber Grid Animated Background -->
+    <div class="cyber-grid-bg"></div>
+
+    <!-- ========================================================================= -->
+    <!-- TOP HEADER / NAVIGATION                                                   -->
+    <!-- Back Button returns to Marketplace or previous details popup              -->
+    <!-- ========================================================================= -->
+    <header class="marketplace-header">
+        <div class="marketplace-header-container">
+            <button class="nav-back-btn" onclick="goBack()" title="Back to Marketplace" aria-label="Back">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span class="back-btn-text">Back to Marketplace</span>
+            </button>
+
+            <!-- Brand Title -->
+            <div class="marketplace-brand" onclick="window.location.href='marketplace.html'">
+                <span class="cyber-icon">⚡</span>
+                <span class="brand-text">SafeCampus <span class="neon-blue-text">Lender Profile</span></span>
+            </div>
+
+            <!-- Current User Profile Circle -->
+            <div class="header-profile-zone">
+                <button class="profile-circle-btn" onclick="window.location.href='profile.html'" title="My Profile">
+                    <span id="userInitialBadge">G</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- MAIN SELLER PROFILE DASHBOARD                                             -->
+    <!-- Left: Seller Info Card (Avatar + verified stats + contact)                -->
+    <!-- Right: Seller's Lending History & Reliability Record                      -->
+    <!-- ========================================================================= -->
+    <main class="profile-main-container">
+        
+        <div class="profile-top-grid">
+            
+            <!-- ================================================================= -->
+            <!-- 1. SELLER INFORMATION CARD                                        -->
+            <!-- ================================================================= -->
+            <div class="profile-card-cyber">
+                <!-- Circular Avatar -->
+                <div class="profile-avatar-wrapper">
+                    <div class="profile-avatar-circle-large" id="sellerAvatarLarge">
+                        <span id="sellerAvatarInitial">R</span>
+                        <div class="avatar-online-dot"></div>
+                    </div>
+                </div>
+
+                <!-- Structured Seller Details -->
+                <div class="profile-details-content">
+                    <div class="profile-badge-row">
+                        <span class="verified-student-tag">✓ VERIFIED CAMPUS LENDER</span>
+                        <span class="trust-score-badge">⭐ 4.9 Trust Rating</span>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Name:</span>
+                        <span class="field-value highlight-name" id="displaySellerName">Rahul Verma</span>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Branch:</span>
+                        <span class="field-value" id="displaySellerBranch">Information Technology (IT)</span>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Year:</span>
+                        <span class="field-value" id="displaySellerYear">3rd Year (B.Tech)</span>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Hostel no:</span>
+                        <span class="field-value" id="displaySellerHostel">Hostel No 24</span>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Room No:</span>
+                        <span class="field-value" id="displaySellerRoom">Room 203</span>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Phone number:</span>
+                        <span class="field-value" id="displaySellerPhone">+91 9437543796</span>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Email address:</span>
+                        <span class="field-value" id="displaySellerEmail">abcd@gmail.com</span>
+                    </div>
+
+                    <!-- Direct Contact CTA Actions for Buyers -->
+                    <div class="seller-contact-actions">
+                        <a href="tel:9437543796" id="sellerCallBtn" class="btn-contact-seller">
+                            📞 Call Seller
+                        </a>
+                        <a href="mailto:abcd@gmail.com" id="sellerMailBtn" class="btn-email-seller">
+                            ✉️ Email
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================================================================= -->
+            <!-- 2. SELLER LENDING & SHARING HISTORY                               -->
+            <!-- Displays peer-to-peer sharing track record and return punctuality -->
+            <!-- ================================================================= -->
+            <div class="history-panel-cyber">
+                <div class="history-header">
+                    <div class="history-title-wrap">
+                        <span class="history-icon">📜</span>
+                        <h2 class="history-heading">LENDING HISTORY</h2>
+                    </div>
+                    <span class="history-count-badge" id="sellerHistoryCountBadge">Verified Record</span>
+                </div>
+
+                <!-- Activity Feed -->
+                <div class="history-feed-list" id="sellerHistoryFeedList">
+                    <!-- Populated dynamically via seller_profile.js -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===================================================================== -->
+        <!-- 3. ITEMS LISTED BY THIS SELLER (ACTIVE INVENTORY)                     -->
+        <!-- Displays items this seller is currently offering                      -->
+        <!-- ===================================================================== -->
+        <section class="uploaded-items-section">
+            <div class="uploaded-section-header">
+                <div class="uploaded-title-wrap">
+                    <h2 class="uploaded-heading" id="sellerItemsHeading">Items Available from Rahul Verma</h2>
+                    <span class="uploaded-subtitle">Browse all resources and academic materials shared by this student</span>
+                </div>
+            </div>
+
+            <!-- Seller Items Grid -->
+            <div class="uploaded-items-grid" id="sellerActiveItemsGrid">
+                <!-- Populated dynamically via seller_profile.js -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Item Details Modal -->
+    <div class="modal-overlay" id="itemDetailsModal">
+        <div class="item-detail-modal-container">
+            <button class="modal-close-btn" onclick="closeItemDetailsModal()">&times;</button>
+            <div class="item-detail-layout">
+                <div class="item-detail-image-box">
+                    <img id="detailItemImage" src="item_calculator.jpg" alt="Item Image">
+                    <div class="item-detail-badge" id="detailItemCategory">Electronics</div>
+                </div>
+                <div class="item-detail-info-box">
+                    <div class="info-row">
+                        <span class="info-label">Item Name:</span>
+                        <span class="info-value info-title" id="detailItemName">Calculator</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Item Description:</span>
+                        <p class="info-value info-desc" id="detailItemDesc">Casio FX-991CW Calculator</p>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Lender:</span>
+                        <span class="info-value" id="detailLenderName">Rahul Verma</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Location:</span>
+                        <span class="info-value" id="detailLocation">Room No 203, Hostel No 24</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Availability Period:</span>
+                        <span class="info-value availability-highlight" id="detailAvailability">5th Oct - 8th Oct</span>
+                    </div>
+                    <div class="contact-details-box">
+                        <div class="contact-header-title">Contact Details</div>
+                        <div class="contact-entry">
+                            <span class="contact-num">1) Phone no :</span>
+                            <span class="contact-val" id="detailPhone">9437543796</span>
+                            <button class="btn-copy-mini" onclick="copyText('detailPhone')" title="Copy Phone">📋</button>
+                        </div>
+                        <div class="contact-entry">
+                            <span class="contact-num">2) Email address :</span>
+                            <span class="contact-val" id="detailEmail">abcd@gmail.com</span>
+                            <button class="btn-copy-mini" onclick="copyText('detailEmail')" title="Copy Email">📋</button>
+                        </div>
+                    </div>
+                    <div class="item-modal-actions">
+                        <button class="btn-request-toggle" id="btnRequestItem" onclick="toggleItemRequest()">
+                            <span id="requestBtnText">Request Item</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-wrapper"></div>
+
+    <!-- Scripts -->
+    <script src="seller_profile.js"></script>
+</body>
+</html>

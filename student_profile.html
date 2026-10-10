@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeCampus Connect — Student Information</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;900&family=Rajdhani:wght@500;600;700&family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="emergency_hub.css">
+    <style>
+        .student-profile-wrapper {
+            max-width: 800px;
+            margin: 2.5rem auto 4rem;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 5;
+        }
+        .student-id-card-cyber {
+            background: #0f172a;
+            border: 2px solid rgba(0, 240, 255, 0.35);
+            border-radius: 24px;
+            padding: 3.5rem 2.5rem 2.5rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 240, 255, 0.15);
+            position: relative;
+            transition: all var(--transition-smooth);
+        }
+        .student-id-card-cyber:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.3);
+        }
+        .student-avatar-top {
+            position: absolute;
+            top: -45px;
+            left: 2.5rem;
+        }
+        .student-avatar-circle {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7e22ce, #a855f7);
+            border: 3px solid #c084fc;
+            color: white;
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.7);
+            position: relative;
+        }
+        .student-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem 2rem;
+            margin-top: 1.5rem;
+        }
+        @media (max-width: 640px) {
+            .student-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .student-field-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .student-field-label {
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+        }
+        .student-field-val {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #ffffff;
+            font-family: 'Fira Code', monospace, var(--font-body);
+        }
+        .highlight-student-name {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--neon-blue);
+            font-family: var(--font-heading);
+            letter-spacing: 1px;
+        }
+        .emergency-safety-section {
+            margin-top: 2rem;
+            padding: 1.25rem 1.5rem;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .blood-group-tag {
+            background: var(--danger-red);
+            color: white;
+            padding: 0.35rem 0.85rem;
+            border-radius: 8px;
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+    </style>
+</head>
+<body class="hub-page-body">
+
+    <div class="cyber-grid-bg"></div>
+
+    <!-- Header Navigation -->
+    <header class="hub-header">
+        <div class="hub-header-container">
+            <button class="nav-back-cyber-btn" onclick="goBack()" title="Back" aria-label="Back">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span class="back-btn-text">Back to Hub</span>
+            </button>
+
+            <div class="hub-brand" onclick="goBack()">
+                <span class="hub-brand-icon">🛡️</span>
+                <span class="hub-brand-title">SafeCampus <span class="green-glow-text">Student</span> Profile</span>
+            </div>
+
+            <div class="header-profile-zone">
+                <span class="verified-student-tag">✓ ID VERIFIED</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Student Information Only Section -->
+    <main class="student-profile-wrapper">
+        <div class="student-id-card-cyber">
+            
+            <!-- Circular Avatar -->
+            <div class="student-avatar-top">
+                <div class="student-avatar-circle">
+                    <span id="displayAvatarLetter">R</span>
+                    <div class="avatar-online-dot"></div>
+                </div>
+            </div>
+
+            <!-- Student Top Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+                <div>
+                    <span class="verified-student-tag">BIT SINDRI STUDENT IDENTITY</span>
+                    <h1 class="highlight-student-name" id="displayStudentName" style="margin-top: 0.5rem;">Rita Kumari</h1>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 0.75rem; color: #94a3b8;">SAFETY ID</span><br>
+                    <span style="font-family: 'Fira Code', monospace; color: var(--neon-blue); font-weight: bold;">BIT-SC-2026-9437</span>
+                </div>
+            </div>
+
+            <!-- Student Information Grid -->
+            <div class="student-info-grid">
+                <div class="student-field-box">
+                    <span class="student-field-label">ROLL NUMBER</span>
+                    <span class="student-field-val" id="displayStudentRoll">21/IT/042</span>
+                </div>
+
+                <div class="student-field-box">
+                    <span class="student-field-label">BRANCH / DISCIPLINE</span>
+                    <span class="student-field-val" id="displayStudentBranch">Information Technology (IT)</span>
+                </div>
+
+                <div class="student-field-box">
+                    <span class="student-field-label">ACADEMIC YEAR</span>
+                    <span class="student-field-val" id="displayStudentYear">3rd Year (B.Tech)</span>
+                </div>
+
+                <div class="student-field-box">
+                    <span class="student-field-label">CAMPUS RESIDENCE</span>
+                    <span class="student-field-val" id="displayStudentHostel">Hostel No 43, Room 23</span>
+                </div>
+
+                <div class="student-field-box">
+                    <span class="student-field-label">PRIMARY CONTACT PHONE</span>
+                    <span class="student-field-val" id="displayStudentPhone">+91 9437543796</span>
+                </div>
+
+                <div class="student-field-box">
+                    <span class="student-field-label">INSTITUTIONAL EMAIL</span>
+                    <span class="student-field-val" id="displayStudentEmail">ritaa34@gmail.com</span>
+                </div>
+            </div>
+
+            <!-- Emergency Safety Info Sub-box -->
+            <div class="emergency-safety-section">
+                <div>
+                    <span style="font-size: 0.8rem; font-weight: bold; color: #fca5a5; display: block;">EMERGENCY MEDICAL INFO</span>
+                    <span style="font-size: 0.85rem; color: #e2e8f0;">Emergency Guardian: Mr. R. Kumari (+91 9845123490)</span>
+                </div>
+                <div>
+                    <span class="blood-group-tag">🩸 Blood Group: O+</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let profile = {
+                name: "Rita Kumari",
+                roll: "21/IT/042",
+                branch: "Information Technology (IT)",
+                year: "3rd Year (B.Tech)",
+                hostel: "Hostel No 43",
+                room: "Room 23",
+                phone: "+91 9437543796",
+                email: "ritaa34@gmail.com"
+            };
+
+            try {
+                const storedProfile = localStorage.getItem('safeCampusUserProfile');
+                if (storedProfile) profile = Object.assign(profile, JSON.parse(storedProfile));
+                const authUser = localStorage.getItem('safeCampusUser');
+                if (authUser) profile = Object.assign(profile, JSON.parse(authUser));
+            } catch(e) {}
+
+            document.getElementById('displayStudentName').innerText = profile.name;
+            document.getElementById('displayStudentRoll').innerText = profile.roll || "21/IT/042";
+            document.getElementById('displayStudentBranch').innerText = profile.branch || "Information Technology";
+            document.getElementById('displayStudentYear').innerText = profile.year || "3rd Year (B.Tech)";
+            document.getElementById('displayStudentHostel').innerText = `${profile.hostel || 'Hostel No 43'}, ${profile.room || 'Room 23'}`;
+            document.getElementById('displayStudentPhone').innerText = profile.phone || "+91 9437543796";
+            document.getElementById('displayStudentEmail').innerText = profile.email || "student@bitsindri.ac.in";
+
+            const initial = (profile.name && profile.name.trim()) ? profile.name.trim().charAt(0).toUpperCase() : 'R';
+            document.getElementById('displayAvatarLetter').innerText = initial;
+        });
+
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'emergency_hub.html';
+            }
+        }
+    </script>
+</body>
+</html>

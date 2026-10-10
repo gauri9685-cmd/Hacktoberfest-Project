@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeCampus Connect — Homepage</title>
+    <!-- Google Fonts for futuristic cyber typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ========================================================================= -->
+    <!-- TOP NAVIGATION BAR                                                        -->
+    <!-- Contains Brand Header & LOG IN / Profile Button                           -->
+    <!-- ========================================================================= -->
+    <header class="top-bar">
+        <div class="top-bar-container">
+            <!-- Brand Title -->
+            <div class="brand-title">
+                <span class="cyber-icon">⚡</span>
+                <span class="brand-main">SafeCampus <span class="neon-blue-text">Connect</span></span>
+            </div>
+
+            <!-- Auth Controls Section -->
+            <div class="auth-controls">
+                <!-- LOG IN / Profile Button matching Header -->
+                <button class="btn-login-cyber" id="loginHeaderBtn" onclick="handleHeaderAuthClick()">
+                    LOG IN
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- MAIN HERO SECTION (SIDE-BY-SIDE SPLIT SELECTION CARDS)                     -->
+    <!-- Directly implements Frame 1 "homepage" from wireframe                     -->
+    <!-- Left Card: Campus Marketplace | Right Card: Emergency & Health Hub       -->
+    <!-- ========================================================================= -->
+    <main class="main-content">
+        
+        <!-- Background Cyber Grid Effect -->
+        <div class="cyber-grid-bg"></div>
+
+        <div class="container hero-wrapper">
+
+            <!-- ================================================================= -->
+            <!-- CARD 1 (LEFT): CAMPUS MARKETPLACE & RESOURCE SHARING              -->
+            <!-- Direct Text from Wireframe: "Search for items, borrow or buy      -->
+            <!-- materials and help other in your college by sharing your own      -->
+            <!-- resources."                                                      -->
+            <!-- ================================================================= -->
+            <div class="portal-card card-marketplace">
+                <div class="card-bg-image" style="background-image: url('marketplace_bg.jpg');"></div>
+                <div class="card-overlay"></div>
+                
+                <div class="card-body">
+                    <div class="card-tag">MARKETPLACE</div>
+                    
+                    <!-- Exact Copy from Wireframe Frame 1 -->
+                    <p class="wireframe-text">
+                        Search for items, borrow or buy materials and help other in your college by sharing your own resources.
+                    </p>
+
+                    <!-- Protected Action: Option 1 - Opens login with marketplace redirect intent -->
+                    <button class="btn-portal btn-browse" onclick="handlePortalClick('marketplace', 'marketplace.html')">
+                        <span>BROWSE</span>
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- ================================================================= -->
+            <!-- CARD 2 (RIGHT): EMERGENCY & HEALTHCARE HUB                        -->
+            <!-- Direct Text from Wireframe: "A hub to instantly connect with      -->
+            <!-- campus emergency support and get AI-powered guidance for your     -->
+            <!-- mental and physical well-being."                                  -->
+            <!-- Includes "Need urgent! Click here" shortcut                       -->
+            <!-- ================================================================= -->
+            <div class="portal-card card-emergency">
+                <div class="card-bg-image" style="background-image: url('emergency_hub_bg.jpg');"></div>
+                <div class="card-overlay"></div>
+
+                <!-- Emergency Call Button Shortcut (Top Right of Green Card) -->
+                <button class="urgent-banner urgent-call-banner-btn" onclick="triggerDirectEmergencyCall()" title="Call for Urgent Emergency Help">
+                    <span class="call-banner-icon">📞</span>
+                    <span class="urgent-text">Need urgent help? <span class="highlight-click">Call Now</span></span>
+                </button>
+
+                <div class="card-body">
+                    <div class="card-tag">SAFETY & WELL-BEING</div>
+
+                    <!-- Exact Copy from Wireframe Frame 1 -->
+                    <p class="wireframe-text">
+                        A hub to instantly connect with campus emergency support and get AI-powered guidance for your mental and physical well-being.
+                    </p>
+
+                    <!-- Protected Action: Option 2 - Opens login with hub redirect intent -->
+                    <button class="btn-portal btn-hub" onclick="handlePortalClick('hub', 'emergency_hub.html')">
+                        <span>ENTER HUB</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+
+    <!-- ========================================================================= -->
+    <!-- AUTHENTICATION MODAL (LOGIN / CREATE ACCOUNT)                             -->
+    <!-- Shown when user tries to access protected features or clicks LOG IN       -->
+    <!-- Directly matches Frame 22 & Frame 23 from wireframe                       -->
+    <!-- ========================================================================= -->
+    <div id="authModal" class="modal-overlay">
+        <div class="modal-cyber-container">
+            
+            <!-- Close Button (Red X as in Wireframe Frame 23) -->
+            <button class="modal-close-btn" onclick="closeAuthModal()">&times;</button>
+
+            <!-- ----------------------------------------------------------------- -->
+            <!-- VIEW A: LOG IN FORM (Matching Wireframe Frame 22)                  -->
+            <!-- ----------------------------------------------------------------- -->
+            <div id="loginFormView" class="auth-view active">
+                <h2 class="auth-title">LOG IN</h2>
+                
+                <form onsubmit="event.preventDefault(); processLogin();">
+                    <div class="form-group-cyber">
+                        <input type="text" id="loginName" placeholder="Enter name" required>
+                    </div>
+                    
+                    <div class="form-group-cyber">
+                        <input type="text" id="loginRoll" placeholder="Enter roll no" required>
+                    </div>
+
+                    <button type="submit" class="btn-auth-submit">LOG IN</button>
+                </form>
+
+                <!-- Wireframe Frame 22 footer link -->
+                <div class="auth-toggle-footer">
+                    Don't have an account? <span class="link-highlight" onclick="switchAuthView('signup')">Click HERE to Sign up</span>
+                </div>
+            </div>
+
+
+            <!-- ----------------------------------------------------------------- -->
+            <!-- VIEW B: SIGN UP / CREATE ACCOUNT FORM (Matching Wireframe Frame 23)-->
+            <!-- Fields: Full name, roll no, branch, email, phone, hostel, room     -->
+            <!-- ----------------------------------------------------------------- -->
+            <div id="signupFormView" class="auth-view">
+                <h2 class="auth-title">CREATE ACCOUNT</h2>
+                
+                <form onsubmit="event.preventDefault(); processSignup();">
+                    <div class="form-group-cyber">
+                        <input type="text" id="signupFullName" placeholder="Enter full name" required>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group-cyber">
+                            <input type="text" id="signupRoll" placeholder="Enter roll no" required>
+                        </div>
+                        <div class="form-group-cyber">
+                            <input type="text" id="signupBranch" placeholder="Enter branch" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group-cyber">
+                        <input type="email" id="signupEmail" placeholder="Enter email address" required>
+                    </div>
+
+                    <div class="form-group-cyber">
+                        <input type="tel" id="signupPhone" placeholder="Enter phone number" required>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group-cyber">
+                            <input type="text" id="signupHostel" placeholder="Enter hostel number" required>
+                        </div>
+                        <div class="form-group-cyber">
+                            <input type="text" id="signupRoom" placeholder="Enter room number" required>
+                        </div>
+                    </div>
+
+                    <!-- Photo Upload Button as in Frame 23 -->
+                    <div class="photo-upload-box" onclick="document.getElementById('photoInput').click()">
+                        <span id="photoLabel">📷 Upload a photo</span>
+                        <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="handlePhotoSelect(event)">
+                    </div>
+
+                    <button type="submit" class="btn-auth-submit btn-signup-submit">REGISTER ACCOUNT</button>
+                </form>
+
+                <div class="auth-toggle-footer">
+                    Already have an account? <span class="link-highlight" onclick="switchAuthView('login')">Click HERE to Log in</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ========================================================================= -->
+    <!-- DIRECT URGENT HELP CALL OVERLAY (ACCESSIBLE WITHOUT LOGIN)                 -->
+    <!-- Wireframe Requirement: Connects to nearest emergency responder instantly   -->
+    <!-- Only text below siren is "CALLING..." with 1->2->3->1 animated dots        -->
+    <!-- Red Hang Call Button & Green Blinking Location Pin                         -->
+    <!-- ========================================================================= -->
+    <div id="urgentHelpModal" class="modal-overlay">
+        <div class="urgent-call-box">
+            <button class="modal-close-btn" onclick="closeUrgentHelpModal()">&times;</button>
+            
+            <div class="call-header">
+                <span class="live-pulse-beacon"></span>
+                <span class="call-tag">URGENT EMERGENCY CONNECT (NO LOGIN REQUIRED)</span>
+            </div>
+
+            <div class="call-body">
+                <div class="caller-avatar">🚨</div>
+                
+                <!-- The ONLY text below the siren emoji is "CALLING..." with 1->2->3->1 dot glow cycle -->
+                <h2 class="calling-animated-title">
+                    CALLING<span class="calling-dot dot-1">.</span><span class="calling-dot dot-2">.</span><span class="calling-dot dot-3">.</span>
+                </h2>
+
+                <!-- Bottom Controls: Red Hang Call Button & Green Blinking Location Pin -->
+                <div class="urgent-call-bottom-bar">
+                    <!-- Pin blinking in green light indicating location is being shared -->
+                    <div class="urgent-gps-status-indicator" title="Live location is being shared with emergency responder">
+                        <div class="blinking-green-pin">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                        </div>
+                        <span class="location-sharing-text">Location is being shared</span>
+                    </div>
+
+                    <!-- Red Hang Call Button -->
+                    <button class="btn-hang-up-red" onclick="endUrgentCall()" title="Hang Up / End Call" aria-label="End Call">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Dynamic Toast Notification Box -->
+    <div id="toastContainer" class="toast-wrapper"></div>
+
+    <!-- Main JavaScript Logic -->
+    <script src="script.js"></script>
+</body>
+</html>

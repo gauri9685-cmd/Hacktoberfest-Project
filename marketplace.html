@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeCampus Connect — Campus Marketplace</title>
+    <!-- Google Fonts for futuristic typography matching homepage -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;900&family=Rajdhani:wght@500;600;700&family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="marketplace.css">
+</head>
+<body class="marketplace-page">
+
+    <!-- Cyber Grid Animated Background -->
+    <div class="cyber-grid-bg"></div>
+
+    <!-- ========================================================================= -->
+    <!-- TOP HEADER / NAVIGATION (BACK BUTTON & PROFILE ICON)                      -->
+    <!-- Wireframe Desktop-2 Layout: Back arrow left, Profile circle right          -->
+    <!-- ========================================================================= -->
+    <header class="marketplace-header">
+        <div class="marketplace-header-container">
+            <!-- Back Button returning to previous page (index.html) -->
+            <button class="nav-back-btn" onclick="goBackToHome()" title="Return to Homepage" aria-label="Back">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span class="back-btn-text">Back</span>
+            </button>
+
+            <!-- Brand Badge / Title -->
+            <div class="marketplace-brand" onclick="goBackToHome()">
+                <span class="cyber-icon">⚡</span>
+                <span class="brand-text">SafeCampus <span class="neon-blue-text">Marketplace</span></span>
+            </div>
+
+            <!-- Profile Circular Icon (Wireframe Top-Right) -->
+            <div class="header-profile-zone">
+                <button class="profile-circle-btn" id="headerProfileCircle" onclick="handleProfileClick()" title="User Profile">
+                    <span id="userInitialBadge">G</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- TOP BANNER IMAGE SLIDER (CAROUSEL WITH ARROWS & DOTS)                     -->
+    <!-- Wireframe: Large top banner carousel with campus marketplace visuals      -->
+    <!-- ========================================================================= -->
+    <section class="banner-slider-section">
+        <div class="slider-container" id="marketplaceSlider">
+            
+            <!-- Slide Items Wrapper -->
+            <div class="slider-track" id="sliderTrack">
+                <!-- Slide 1: Textbooks & Study Notes -->
+                <div class="slider-slide active">
+                    <div class="slide-image-bg" style="background-image: url('banner_books.jpg');"></div>
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <span class="slide-tag">ACADEMIC RESOURCES</span>
+                        <h2 class="slide-title">Borrow & Share Engineering Textbooks</h2>
+                        <p class="slide-subtitle">Access semester-critical reference books, notes, and lab manuals from senior batchmates.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Tech, Gadgets & Calculators -->
+                <div class="slider-slide">
+                    <div class="slide-image-bg" style="background-image: url('banner_gadgets.jpg');"></div>
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <span class="slide-tag">TECH & HARDWARE</span>
+                        <h2 class="slide-title">Scientific Calculators, Drafters & Gadgets</h2>
+                        <p class="slide-subtitle">Never miss an exam or lab practical. Instant peer-to-peer equipment borrowing.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Campus Community & Mobility -->
+                <div class="slider-slide">
+                    <div class="slide-image-bg" style="background-image: url('banner_community.jpg');"></div>
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <span class="slide-tag">CAMPUS LIVING</span>
+                        <h2 class="slide-title">Bicycles, Lab Coats & Daily Essentials</h2>
+                        <p class="slide-subtitle">A sustainable, student-driven exchange hub for BIT Sindri hostelites.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slider Left Arrow -->
+            <button class="slider-arrow slider-arrow-prev" onclick="prevSlide()" aria-label="Previous Slide">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+
+            <!-- Slider Right Arrow -->
+            <button class="slider-arrow slider-arrow-next" onclick="nextSlide()" aria-label="Next Slide">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+
+            <!-- Slider Indicator Dots -->
+            <div class="slider-dots" id="sliderDots">
+                <button class="dot-btn active" onclick="goToSlide(0)" aria-label="Slide 1"></button>
+                <button class="dot-btn" onclick="goToSlide(1)" aria-label="Slide 2"></button>
+                <button class="dot-btn" onclick="goToSlide(2)" aria-label="Slide 3"></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MAIN CONTENT AREA                                                         -->
+    <!-- Contains: Center Search Bar, Section Heading, Cards Carousel              -->
+    <!-- ========================================================================= -->
+    <main class="marketplace-main">
+        
+        <!-- ===================================================================== -->
+        <!-- CENTER SEARCH BAR (WIREFRAME DESKTOP-2)                                -->
+        <!-- Search items... and redirects upon hitting enter                       -->
+        <!-- ===================================================================== -->
+        <div class="search-bar-wrapper">
+            <div class="search-bar-cyber">
+                <span class="search-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </span>
+                <input 
+                    type="text" 
+                    id="marketplaceSearchInput" 
+                    class="search-input" 
+                    placeholder="Search items..." 
+                    autocomplete="off"
+                    onkeydown="handleSearchKeydown(event)"
+                >
+                <button class="search-action-btn" onclick="triggerSearch()" title="Search">
+                    <span>Search</span>
+                </button>
+            </div>
+            
+            <!-- Quick Category Filter Badges -->
+            <div class="quick-filter-chips">
+                <button class="filter-chip active" onclick="filterItemsByCategory('all')">All Items</button>
+                <button class="filter-chip" onclick="filterItemsByCategory('Electronics')">Calculators & Electronics</button>
+                <button class="filter-chip" onclick="filterItemsByCategory('Lab & Engineering')">Lab Coats & Drafters</button>
+                <button class="filter-chip" onclick="filterItemsByCategory('Books')">Books & Notes</button>
+                <button class="filter-chip" onclick="filterItemsByCategory('Mobility')">Bicycles & Storage</button>
+            </div>
+        </div>
+
+        <!-- ===================================================================== -->
+        <!-- SECTION HEADING: AVAILABLE ITEMS                                      -->
+        <!-- Exact bold styling matching Wireframe Desktop-2                       -->
+        <!-- ===================================================================== -->
+        <div class="section-title-container">
+            <h1 class="section-heading-available">AVAILABLE ITEMS</h1>
+            <div class="carousel-nav-controls">
+                <button class="btn-carousel-ctrl" onclick="scrollCarousel(-1)" title="Scroll Left">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <button class="btn-carousel-ctrl" onclick="scrollCarousel(1)" title="Scroll Right">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===================================================================== -->
+        <!-- AVAILABLE ITEMS CARDS CAROUSEL                                        -->
+        <!-- Moving card slider with item preview, title, and SEE DETAILS button   -->
+        <!-- ===================================================================== -->
+        <div class="carousel-outer-wrapper">
+            <div class="items-carousel-track" id="itemsCarouselTrack">
+                <!-- Dynamic cards populated by marketplace.js from database model -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ========================================================================= -->
+    <!-- TALK WITH AI FLOATING BUTTON (WIREFRAME DESKTOP-2 LOWER RIGHT)            -->
+    <!-- Wireframe Text: "Click here to chat with AI" with avatar                  -->
+    <!-- ========================================================================= -->
+    <div class="ai-chat-launcher" onclick="toggleAIChatModal()" id="aiChatLauncher">
+        <div class="ai-launcher-bubble">
+            <span class="ai-bubble-text">Click here to chat with AI</span>
+            <div class="ai-avatar-mini">
+                <span>AI</span>
+                <span class="ai-pulse-ring"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- AI CHAT ASSISTANT DRAWER / MODAL (FRAME 17)                               -->
+    <!-- Dark/Neon chat drawer with greeting & conversational search input         -->
+    <!-- ========================================================================= -->
+    <div class="ai-chat-modal" id="aiChatModal">
+        <div class="ai-chat-box">
+            <!-- Chat Window Header -->
+            <div class="ai-chat-header">
+                <div class="ai-header-info">
+                    <div class="ai-header-avatar">AI</div>
+                    <div>
+                        <h3 class="ai-header-title">SafeCampus AI Assistant</h3>
+                        <span class="ai-header-status"><span class="online-indicator"></span> Ready to help find items</span>
+                    </div>
+                </div>
+                <button class="ai-close-btn" onclick="toggleAIChatModal()">&times;</button>
+            </div>
+
+            <!-- Chat Messages Container -->
+            <div class="ai-chat-messages" id="aiChatMessages">
+                <!-- Initial AI Greeting Message (Exact Copy from Wireframe Frame 17) -->
+                <div class="chat-message ai-message">
+                    <div class="chat-bubble ai-bubble">
+                        Hello! Tell me what kind of item you are searching, I'd be happy to assist.
+                    </div>
+                    <span class="chat-timestamp">Just now</span>
+                </div>
+            </div>
+
+            <!-- Chat Input Bar (Frame 17: "Type here to start chatting...") -->
+            <div class="ai-chat-input-wrapper">
+                <input 
+                    type="text" 
+                    id="aiChatInput" 
+                    class="ai-chat-input" 
+                    placeholder="Type here to start chatting..." 
+                    autocomplete="off"
+                    onkeydown="handleAIChatKeydown(event)"
+                >
+                <button class="ai-send-btn" onclick="sendAIChatMessage()" aria-label="Send message">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- ITEM DETAILS MODAL (FRAME 12)                                             -->
+    <!-- Left: Image Preview | Right: Name, Desc, Lender, Location, Contact, etc.  -->
+    <!-- Bottom: Request Item / Cancel Request toggle button                       -->
+    <!-- ========================================================================= -->
+    <div class="modal-overlay" id="itemDetailsModal">
+        <div class="item-detail-modal-container">
+            <button class="modal-close-btn" onclick="closeItemDetailsModal()">&times;</button>
+
+            <div class="item-detail-layout">
+                <!-- Left Column: Item Image Preview -->
+                <div class="item-detail-image-box">
+                    <img id="detailItemImage" src="item_calculator.jpg" alt="Item Image">
+                    <div class="item-detail-badge" id="detailItemCategory">Electronics</div>
+                </div>
+
+                <!-- Right Column: Structured Item Info (Exact Fields from Frame 12) -->
+                <div class="item-detail-info-box">
+                    <div class="info-row">
+                        <span class="info-label">Item Name:</span>
+                        <span class="info-value info-title" id="detailItemName">Calculator</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Item Description:</span>
+                        <p class="info-value info-desc" id="detailItemDesc">
+                            Casio FX-991CW Classwiz Non-Programmable Scientific Calculator, used for 4 years, in good working condition
+                        </p>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Lender:</span>
+                        <span class="info-value">
+                            <span id="detailLenderName">Rahul Verma</span> 
+                            <a href="javascript:void(0)" class="view-profile-link" onclick="openLenderProfile()">[click here to view profile]</a>
+                        </span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Location:</span>
+                        <span class="info-value" id="detailLocation">Room No 203, Hostel No 24</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Availability Period:</span>
+                        <span class="info-value availability-highlight" id="detailAvailability">5th Oct - 8th Oct</span>
+                    </div>
+
+                    <!-- Contact Details Sub-section -->
+                    <div class="contact-details-box">
+                        <div class="contact-header-title">Contact Details</div>
+                        <div class="contact-entry">
+                            <span class="contact-num">1) Phone no :</span>
+                            <span class="contact-val" id="detailPhone">9437543796</span>
+                            <button class="btn-copy-mini" onclick="copyText('detailPhone')" title="Copy Phone">📋</button>
+                        </div>
+                        <div class="contact-entry">
+                            <span class="contact-num">2) Email address :</span>
+                            <span class="contact-val" id="detailEmail">abcd@gmail.com</span>
+                            <button class="btn-copy-mini" onclick="copyText('detailEmail')" title="Copy Email">📋</button>
+                        </div>
+                    </div>
+
+                    <!-- Action Button (Request Item / Cancel Request Toggle) -->
+                    <div class="item-modal-actions">
+                        <button class="btn-request-toggle" id="btnRequestItem" onclick="toggleItemRequest()">
+                            <span id="requestBtnText">Request Item</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Toast Notification Container -->
+    <div id="toastContainer" class="toast-wrapper"></div>
+
+    <!-- Scripts -->
+    <script src="marketplace.js"></script>
+</body>
+</html>

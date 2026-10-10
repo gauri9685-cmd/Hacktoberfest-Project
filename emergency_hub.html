@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeCampus Connect — Safety & Wellness Hub</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;900&family=Rajdhani:wght@500;600;700&family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="emergency_hub.css">
+</head>
+<body class="hub-page-body">
+
+    <!-- Cyber Grid Animated Background -->
+    <div class="cyber-grid-bg"></div>
+
+    <!-- ========================================================================= -->
+    <!-- TOP HEADER / NAVIGATION (POINT 5: CIRCULAR PROFILE BUTTON)                -->
+    <!-- ========================================================================= -->
+    <header class="hub-header">
+        <div class="hub-header-container">
+            <!-- Cyber Glass Back Button -->
+            <button class="nav-back-cyber-btn" onclick="goBackToHome()" title="Back to Homepage" aria-label="Back">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>BACK</span>
+            </button>
+
+            <!-- Brand Title -->
+            <div class="hub-brand" onclick="goBackToHome()">
+                <span class="hub-brand-icon">⚡</span>
+                <span class="hub-brand-title">SafeCampus <span class="cyan-glow-text">Wellness</span> & <span class="magenta-glow-text">Emergency Hub</span></span>
+            </div>
+
+            <!-- Profile Circular Button (Point 5: Circular Shape) -->
+            <div class="header-profile-zone">
+                <button class="profile-circle-btn hub-profile-circle-badge" onclick="openStudentProfile()" title="View Student Information">
+                    <span id="userInitialBadge">G</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- TOP BANNER IMAGE SLIDER (CAROUSEL WITH ARROWS & DOTS)                     -->
+    <!-- ========================================================================= -->
+    <section class="banner-slider-section">
+        <div class="slider-container" id="hubSlider">
+            
+            <!-- Slide Track -->
+            <div class="slider-track" id="sliderTrack">
+                <!-- Slide 1: 24/7 Cyber Emergency Dispatch -->
+                <div class="slider-slide active">
+                    <div class="slide-image-bg" style="background-image: url('banner_cyber_hub.jpg');"></div>
+                    <div class="slide-overlay cyber-cyan-overlay"></div>
+                    <div class="slide-content">
+                        <span class="slide-tag tag-cyan">24/7 CAMPUS DISPATCH</span>
+                        <h2 class="slide-title">Instant Emergency Support & Security Patrol</h2>
+                        <p class="slide-subtitle">Connected directly to BIT Sindri Central Security Desks and Quick Response Teams across all hostel zones.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Health & Medical Dispensary -->
+                <div class="slider-slide">
+                    <div class="slide-image-bg" style="background-image: url('emergency_hub_bg.jpg');"></div>
+                    <div class="slide-overlay cyber-magenta-overlay"></div>
+                    <div class="slide-content">
+                        <span class="slide-tag tag-magenta">HEALTHCARE & FIRST AID</span>
+                        <h2 class="slide-title">Campus Medical Center & Emergency Ambulance</h2>
+                        <p class="slide-subtitle">On-call campus physicians, emergency medical transport, and immediate healthcare triage.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Mental Well-Being & Health AI -->
+                <div class="slider-slide">
+                    <div class="slide-image-bg" style="background-image: url('banner_gadgets.jpg');"></div>
+                    <div class="slide-overlay cyber-dual-overlay"></div>
+                    <div class="slide-content">
+                        <span class="slide-tag tag-cyan">MENTAL WELL-BEING</span>
+                        <h2 class="slide-title">Supportive Guidance & Confidential Health AI</h2>
+                        <p class="slide-subtitle">AI-powered stress reduction, exam anxiety coping mechanisms, and 24/7 supportive companionship.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slider Left Arrow -->
+            <button class="slider-arrow slider-arrow-prev" onclick="prevSlide()" aria-label="Previous Slide">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+
+            <!-- Slider Right Arrow -->
+            <button class="slider-arrow slider-arrow-next" onclick="nextSlide()" aria-label="Next Slide">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+
+            <!-- Slider Dots -->
+            <div class="slider-dots" id="sliderDots">
+                <button class="dot-btn active" onclick="goToSlide(0)" aria-label="Slide 1"></button>
+                <button class="dot-btn" onclick="goToSlide(1)" aria-label="Slide 2"></button>
+                <button class="dot-btn" onclick="goToSlide(2)" aria-label="Slide 3"></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MAIN HERO ACTION REGION (3 BIG CENTRAL BUTTONS)                           -->
+    <!-- ========================================================================= -->
+    <main class="hub-main-hero">
+        <div class="hub-hero-bg-wrapper">
+            <div class="hub-hero-bg-image" style="background-image: url('banner_cyber_hub.jpg');"></div>
+            <div class="hub-hero-overlay"></div>
+            <div class="hub-radar-sweep"></div>
+        </div>
+
+        <div class="hub-actions-container">
+            <!-- Button 1: VIEW ALL EMERGENCY CONTACTS -->
+            <button class="btn-hub-action btn-action-contacts" onclick="openEmergencyContactsModal()">
+                <span class="btn-action-icon">📞</span>
+                <span class="btn-action-text">VIEW ALL EMERGENCY CONTACTS</span>
+            </button>
+
+            <!-- Button 2: REPORT AN INCIDENT -->
+            <button class="btn-hub-action btn-action-report" onclick="openReportIncidentModal()">
+                <span class="btn-action-icon">⚠️</span>
+                <span class="btn-action-text">REPORT AN INCIDENT</span>
+            </button>
+
+            <!-- Button 3: SHARE LOCATION AND CONNECT WITH NEAREST EMERGENCY RESPONDER -->
+            <button class="btn-hub-action btn-action-sos" onclick="triggerSOSConnect()">
+                <span class="sos-beacon-dot"></span>
+                <span class="btn-action-text">SHARE LOCATION AND CONNECT WITH NEAREST EMERGENCY RESPONDER</span>
+            </button>
+        </div>
+    </main>
+
+    <!-- ========================================================================= -->
+    <!-- FLOATING LOCATION SHARING WIDGET (LOWER LEFT - FIXED OVER PAGE)           -->
+    <!-- ========================================================================= -->
+    <div class="floating-location-widget" id="floatingLocationWidget">
+        <div class="loc-widget-card">
+            <div class="loc-widget-header">
+                <div class="loc-pin-icon-wrap">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <!-- Glowing Green Indicator when Location Sharing is ON -->
+                    <span class="live-gps-indicator-dot active" id="liveGpsIndicatorDot" title="GPS Status Indicator"></span>
+                </div>
+                <div class="loc-widget-text">
+                    <span class="loc-widget-title">Location Sharing</span>
+                    <span class="loc-widget-status" id="locStatusText">GPS Active: BIT Campus</span>
+                </div>
+            </div>
+
+            <div class="loc-widget-actions">
+                <button class="btn-loc-pill btn-loc-on active" id="btnLocOn" onclick="toggleLocationSharing(true)">
+                    TURN ON
+                </button>
+                <button class="btn-loc-pill btn-loc-off" id="btnLocOff" onclick="toggleLocationSharing(false)">
+                    TURN OFF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- FLOATING HEALTH AI TALK BUTTON (LOWER RIGHT - FIXED OVER PAGE)            -->
+    <!-- ========================================================================= -->
+    <div class="ai-chat-launcher hub-wellness-launcher" onclick="openWellnessChatModal()" id="wellnessChatLauncher" title="Talk to AI about your health">
+        <div class="ai-launcher-bubble wellness-launcher-bubble">
+            <span class="ai-bubble-text">Talk with Health AI</span>
+            <div class="ai-avatar-mini wellness-avatar-glow">
+                <span>🌱</span>
+                <span class="ai-pulse-ring wellness-pulse-ring"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- POINT 3: FRAME 36 HEALTH AI CHAT WINDOW (EXACT BLUE WIREFRAME LAYOUT)     -->
+    <!-- Periwinkle blue theme, top dark message bubble, bottom pill input         -->
+    <!-- ========================================================================= -->
+    <div class="modal-overlay" id="wellnessChatOverlay">
+        <div class="frame36-chat-container">
+            <!-- Close Button -->
+            <button class="frame36-close-btn" onclick="closeWellnessChatModal()">&times;</button>
+            
+            <!-- User Avatar Circle on right (Frame 36) -->
+            <div class="frame36-avatar-circle" title="User">
+                <span id="frame36UserInitial">G</span>
+            </div>
+
+            <!-- Messages Scroll Area -->
+            <div class="frame36-messages-area" id="wellnessChatMessages">
+                <!-- Initial Top AI Message Bubble (Frame 36) -->
+                <div class="frame36-ai-bubble">
+                    Talk to me about your health. I will be happy to provide some general advice.
+                </div>
+            </div>
+
+            <!-- Frame 36 Bottom Input Field (Pill Shape) -->
+            <div class="frame36-input-wrapper">
+                <input 
+                    type="text" 
+                    id="wellnessChatInput" 
+                    class="frame36-pill-input" 
+                    placeholder="Type here to start chatting..." 
+                    autocomplete="off"
+                    onkeydown="handleWellnessKeydown(event)"
+                >
+                <button class="frame36-send-btn" onclick="sendWellnessMessage()" aria-label="Send">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- POINT 1: REPORT AN INCIDENT (FRAME 37 WITH OTHER CATEGORY & HIGH CONTRAST)-->
+    <!-- ========================================================================= -->
+    <div class="modal-overlay" id="reportIncidentModal">
+        <!-- Circling Dual Neon Laser Wrapper -->
+        <div class="neon-circling-border-wrapper">
+            <div class="incident-modal-content-box">
+                <button class="modal-close-btn cyan-close-btn" onclick="closeReportIncidentModal()">&times;</button>
+                
+                <!-- Top Section: Header, Category & Location -->
+                <div class="incident-modal-top">
+                    <div class="incident-title-row">
+                        <span class="incident-alert-icon">⚠️</span>
+                        <div>
+                            <h2 class="incident-title-text">REPORT AN INCIDENT</h2>
+                            <span class="incident-subtitle-text">Submit security alerts, health emergencies, or safety hazards</span>
+                        </div>
+                    </div>
+
+                    <div class="incident-top-fields-grid">
+                        <!-- Point 1: Fixed Select Dropdown with Dark High-Contrast Background & "Other" Option -->
+                        <div class="form-group-compact">
+                            <label class="form-compact-label">CATEGORY</label>
+                            <select id="incidentCategory" class="cyber-select-dark compact-select" required>
+                                <option value="Security / Suspicious Activity">Security / Suspicious Activity</option>
+                                <option value="Medical Emergency / Injury">Medical Emergency / Injury</option>
+                                <option value="Harassment / Ragging Concern">Harassment / Ragging Concern</option>
+                                <option value="Infrastructure / Fire Hazard">Infrastructure / Fire / Electrical Hazard</option>
+                                <option value="Lost & Found Property">Lost & Found Property</option>
+                                <option value="Other">Other (Please specify in description)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group-compact">
+                            <label class="form-compact-label">CAMPUS LOCATION</label>
+                            <input type="text" id="incidentLocation" class="cyber-input compact-input" placeholder="e.g. Near Hostel 24 / IT Dept" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center Section: HUGE INCIDENT DESCRIPTION BOX (FRAME 37) -->
+                <div class="incident-modal-center">
+                    <div class="incident-textarea-wrapper">
+                        <textarea 
+                            id="incidentDetails" 
+                            class="incident-large-textarea" 
+                            placeholder="DESCRIBE THE INCIDENT..." 
+                            required
+                        ></textarea>
+                    </div>
+                </div>
+
+                <!-- Bottom Section: Checkboxes & SUBMIT Button (Frame 37) -->
+                <div class="incident-modal-bottom">
+                    <div class="incident-checkboxes-wrap">
+                        <label class="cyber-checkbox-label">
+                            <input type="checkbox" id="incidentAttachGps" checked>
+                            <span>📍 Attach Live GPS Coordinates</span>
+                        </label>
+                        <label class="cyber-checkbox-label">
+                            <input type="checkbox" id="incidentAnonymous">
+                            <span>🛡️ Submit Anonymously / Confidential</span>
+                        </label>
+                    </div>
+
+                    <!-- Frame 37 Style SUBMIT Button -->
+                    <button type="button" class="btn-incident-submit-frame37" onclick="submitIncidentReport()">
+                        <span>SUBMIT</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- POINT 2: ALL EMERGENCY CONTACTS (SCROLLABLE FOR BACKEND DATABASE)         -->
+    <!-- ========================================================================= -->
+    <div class="modal-overlay" id="contactsModal">
+        <div class="hub-modal-container">
+            <button class="modal-close-btn red-x-btn" onclick="closeEmergencyContactsModal()">&times;</button>
+            
+            <div class="hub-modal-header cyber-border-header">
+                <span class="modal-header-icon">🚨</span>
+                <div>
+                    <h2 class="hub-modal-title cyan-accent">Campus Emergency Contacts</h2>
+                    <span class="hub-modal-subtitle">Direct line to BIT Sindri response units and local services</span>
+                </div>
+            </div>
+
+            <!-- Scrollable Contacts Grid on the Right Side (Point 2) -->
+            <div class="contacts-directory-scrollable" id="contactsDirectoryContainer">
+                <!-- Dynamically populated from CAMPUS_EMERGENCY_CONTACTS database model in emergency_hub.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- POINT 4: FRAME 42 - SOS & CAMPUS RESPONDERS WINDOW (3RD BUTTON)           -->
+    <!-- Split Layout: Left Dialer + Right Campus Responders List + Red 'X' Close   -->
+    <!-- ========================================================================= -->
+    <div class="modal-overlay" id="sosModal">
+        <div class="frame42-modal-container">
+            <!-- Top Right Red Close Button (Frame 42) -->
+            <button class="frame42-close-btn" onclick="closeSOSModal()">&times;</button>
+            
+            <div class="frame42-split-layout">
+                
+                <!-- Left Column: Active Call to Nearest Emergency Responder -->
+                <div class="frame42-left-caller-pane">
+                    <div class="frame42-caller-text">
+                        Calling nearest emergency<br>
+                        responder: <span id="activeSOSPhone" class="highlight-phone">+91 8943672354</span>
+                    </div>
+
+                    <div class="frame42-avatar-box">
+                        <div class="frame42-user-icon">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="#cbd5e1"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <span class="frame42-calling-status">Calling...</span>
+                    </div>
+
+                    <!-- Call Action Controls: Video, End Call, Mute -->
+                    <div class="frame42-call-controls">
+                        <button class="btn-call-ctrl btn-video-call" onclick="showToast('Connecting camera stream...', 'info')" title="Video Call">
+                            📹
+                        </button>
+                        <button class="btn-call-ctrl btn-end-call-red" onclick="closeSOSModal()" title="End Call">
+                            📞
+                        </button>
+                        <button class="btn-call-ctrl btn-mute-mic" onclick="showToast('Microphone toggled', 'info')" title="Mute Mic">
+                            🎤
+                        </button>
+                    </div>
+
+                    <!-- Bottom-Left Green GPS Beacon Pin (Frame 42) -->
+                    <div class="frame42-gps-pin" title="Live GPS Transmitting">
+                        <div class="frame42-pin-inner"></div>
+                    </div>
+                </div>
+
+                <!-- Right Column: View Details of Other Responders in Your Campus -->
+                <div class="frame42-right-responders-pane">
+                    <h3 class="frame42-responders-title">
+                        VIEW DETAILS OF OTHER RESPONDERS IN YOUR CAMPUS
+                    </h3>
+
+                    <!-- Scrollable Responders Directory (Frame 42) -->
+                    <div class="frame42-responders-list" id="frame42RespondersList">
+                        <!-- Populated dynamically from CAMPUS_RESPONDERS_DATABASE -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Toast Notification Container -->
+    <div id="toastContainer" class="toast-wrapper"></div>
+
+    <!-- Scripts -->
+    <script src="emergency_hub.js"></script>
+</body>
+</html>

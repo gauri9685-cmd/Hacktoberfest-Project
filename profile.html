@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeCampus Connect — User Profile</title>
+    <!-- Google Fonts matching SafeCampus Connect Theme -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;900&family=Rajdhani:wght@500;600;700&family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="marketplace.css">
+    <link rel="stylesheet" href="profile.css">
+</head>
+<body class="marketplace-page profile-page-body">
+
+    <!-- Cyber Grid Animated Background -->
+    <div class="cyber-grid-bg"></div>
+
+    <!-- ========================================================================= -->
+    <!-- TOP HEADER / NAVIGATION                                                   -->
+    <!-- Wireframe Profile: Back button on top left, Profile avatar, brand         -->
+    <!-- ========================================================================= -->
+    <header class="marketplace-header">
+        <div class="marketplace-header-container">
+            <!-- Back Button returning to Marketplace -->
+            <button class="nav-back-btn" onclick="goBack()" title="Back to Marketplace" aria-label="Back">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span class="back-btn-text">Back</span>
+            </button>
+
+            <!-- Brand Title -->
+            <div class="marketplace-brand" onclick="window.location.href='index.html'">
+                <span class="cyber-icon">⚡</span>
+                <span class="brand-text">SafeCampus <span class="neon-blue-text">Profile</span></span>
+            </div>
+
+            <!-- Profile Controls & Logout -->
+            <div class="header-profile-zone">
+                <button class="btn-logout-cyber" onclick="handleLogout()" title="Log Out">
+                    <span>Log Out</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- MAIN PROFILE DASHBOARD                                                    -->
+    <!-- Split Layout matching Wireframe:                                          -->
+    <!-- Left: Profile Info Card with Circular Avatar                              -->
+    <!-- Right: History Timeline (Borrowed & Shared Item Records)                  -->
+    <!-- ========================================================================= -->
+    <main class="profile-main-container">
+        
+        <div class="profile-top-grid">
+            
+            <!-- ================================================================= -->
+            <!-- 1. USER INFORMATION CARD (WIREFRAME LEFT SECTION)                 -->
+            <!-- Large circular avatar badge + structured user details             -->
+            <!-- ================================================================= -->
+            <div class="profile-card-cyber">
+                <!-- Glowing Circular Avatar (Matches Wireframe Circle on Top) -->
+                <div class="profile-avatar-wrapper">
+                    <div class="profile-avatar-circle-large" id="profileAvatarLarge">
+                        <span id="profileAvatarInitial">R</span>
+                        <div class="avatar-online-dot"></div>
+                    </div>
+                </div>
+
+                <!-- Structured User Details -->
+                <div class="profile-details-content">
+                    <div class="profile-badge-row">
+                        <span class="verified-student-tag">✓ VERIFIED STUDENT</span>
+                        <button class="btn-edit-profile-mini" onclick="openEditProfileModal()" title="Edit details">✏️ Edit</button>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Name:</span>
+                        <span class="field-value highlight-name" id="displayProfileName">Rita Kumari</span>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Branch:</span>
+                        <span class="field-value" id="displayProfileBranch">Information Technology (IT)</span>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Year:</span>
+                        <span class="field-value" id="displayProfileYear">2nd Year (B.Tech)</span>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Hostel no:</span>
+                        <span class="field-value" id="displayProfileHostel">Hostel No 43</span>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Room No:</span>
+                        <span class="field-value" id="displayProfileRoom">Room 23</span>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Phone number:</span>
+                        <span class="field-value" id="displayProfilePhone">+91 9437543796</span>
+                    </div>
+
+                    <div class="profile-field-row">
+                        <span class="field-label">Email address:</span>
+                        <span class="field-value" id="displayProfileEmail">ritaa34@gmail.com</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================================================================= -->
+            <!-- 2. USER ACTIVITY HISTORY (WIREFRAME RIGHT SECTION)                -->
+            <!-- Shows records when user borrowed, shared, sold or requested items -->
+            <!-- ================================================================= -->
+            <div class="history-panel-cyber">
+                <div class="history-header">
+                    <div class="history-title-wrap">
+                        <span class="history-icon">📜</span>
+                        <h2 class="history-heading">HISTORY</h2>
+                    </div>
+                    <span class="history-count-badge" id="historyCountBadge">5 Activities</span>
+                </div>
+
+                <!-- Scrollable Activity Timeline Feed -->
+                <div class="history-feed-list" id="historyFeedList">
+                    <!-- Populated dynamically via profile.js -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===================================================================== -->
+        <!-- 3. UPLOADED ITEMS SECTION (WIREFRAME BOTTOM SECTION)                  -->
+        <!-- Displays items the user listed for selling or free sharing            -->
+        <!-- ===================================================================== -->
+        <section class="uploaded-items-section">
+            <div class="uploaded-section-header">
+                <div class="uploaded-title-wrap">
+                    <h2 class="uploaded-heading">Uploaded Items</h2>
+                    <span class="uploaded-subtitle">Items you are sharing free of cost or selling to batchmates</span>
+                </div>
+            </div>
+
+            <!-- Uploaded Items Cards Grid -->
+            <div class="uploaded-items-grid" id="uploadedItemsGrid">
+                <!-- Populated dynamically via profile.js -->
+            </div>
+
+            <!-- Big Prominent "Upload Item" Action Button matching Wireframe -->
+            <div class="upload-btn-container">
+                <button class="btn-upload-primary" onclick="openUploadItemModal()">
+                    <span class="upload-plus-icon">+</span>
+                    <span>Upload Item</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ========================================================================= -->
+    <!-- UPLOAD ITEM MODAL (POPUP FORM TO LIST NEW ITEM TO SELL / SHARE)           -->
+    <!-- Allows user to set free or priced, description, photos, location, etc.    -->
+    <!-- ========================================================================= -->
+    <div class="modal-overlay" id="uploadItemModal">
+        <div class="upload-modal-container">
+            <button class="modal-close-btn" onclick="closeUploadItemModal()">&times;</button>
+            
+            <div class="upload-modal-header">
+                <span class="cyber-icon">📦</span>
+                <h2 class="upload-modal-title">List an Item to Share / Sell</h2>
+            </div>
+            <p class="upload-modal-desc">Share books, calculators, drafters, or cycles with your campus community.</p>
+
+            <form id="uploadItemForm" onsubmit="event.preventDefault(); processItemUpload();">
+                
+                <div class="form-group-cyber">
+                    <label class="form-cyber-label">Item Name *</label>
+                    <input type="text" id="newItemName" placeholder="e.g. Casio Scientific Calculator / Lab Coat / CLRS Book" required>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group-cyber">
+                        <label class="form-cyber-label">Category *</label>
+                        <select id="newItemCategory" class="cyber-select" required>
+                            <option value="Electronics">Calculators & Electronics</option>
+                            <option value="Lab & Engineering">Lab Coats & Drafters</option>
+                            <option value="Books">Books & Notes</option>
+                            <option value="Mobility">Bicycles & Storage</option>
+                            <option value="Other">Other Campus Essentials</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group-cyber">
+                        <label class="form-cyber-label">Listing Type *</label>
+                        <select id="newItemListingType" class="cyber-select" onchange="togglePriceField(this.value)" required>
+                            <option value="free">Free to Borrow / Share</option>
+                            <option value="sell">Sell to Batchmates</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group-cyber" id="priceFieldGroup" style="display: none;">
+                        <label class="form-cyber-label">Selling Price (₹)</label>
+                        <input type="number" id="newItemPrice" placeholder="e.g. 250" min="0">
+                    </div>
+
+                    <div class="form-group-cyber">
+                        <label class="form-cyber-label">Availability Period *</label>
+                        <input type="text" id="newItemAvailability" placeholder="e.g. 10th Oct - 25th Oct / Available Always" required>
+                    </div>
+                </div>
+
+                <div class="form-group-cyber">
+                    <label class="form-cyber-label">Brief Description *</label>
+                    <textarea id="newItemDesc" class="cyber-textarea" rows="3" placeholder="Mention item condition, semester use, accessories included..." required></textarea>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group-cyber">
+                        <label class="form-cyber-label">Hostel & Room *</label>
+                        <input type="text" id="newItemLocation" placeholder="e.g. Room 23, Hostel No 43" required>
+                    </div>
+
+                    <div class="form-group-cyber">
+                        <label class="form-cyber-label">Contact Phone</label>
+                        <input type="tel" id="newItemPhone" placeholder="+91 9437543796">
+                    </div>
+                </div>
+
+                <!-- Image Selector / Photo Preset -->
+                <div class="form-group-cyber">
+                    <label class="form-cyber-label">Item Photo Preset or Upload</label>
+                    <div class="photo-preset-selector">
+                        <label class="preset-pill">
+                            <input type="radio" name="itemPhotoPreset" value="item_calculator.jpg" checked>
+                            <span>Calculator</span>
+                        </label>
+                        <label class="preset-pill">
+                            <input type="radio" name="itemPhotoPreset" value="banner_community.jpg">
+                            <span>Lab Coat / Cycle</span>
+                        </label>
+                        <label class="preset-pill">
+                            <input type="radio" name="itemPhotoPreset" value="banner_books.jpg">
+                            <span>Books / Drafter</span>
+                        </label>
+                        <label class="preset-pill">
+                            <input type="radio" name="itemPhotoPreset" value="banner_gadgets.jpg">
+                            <span>Gadgets / Pen Drive</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-auth-submit btn-publish-item">
+                    <span>PUBLISH TO MARKETPLACE</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- EDIT PROFILE MODAL                                                        -->
+    <!-- ========================================================================= -->
+    <div class="modal-overlay" id="editProfileModal">
+        <div class="upload-modal-container" style="max-width: 480px;">
+            <button class="modal-close-btn" onclick="closeEditProfileModal()">&times;</button>
+            
+            <div class="upload-modal-header">
+                <span class="cyber-icon">👤</span>
+                <h2 class="upload-modal-title">Edit Profile Information</h2>
+            </div>
+
+            <form onsubmit="event.preventDefault(); saveEditedProfile();">
+                <div class="form-group-cyber">
+                    <label class="form-cyber-label">Full Name</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div class="form-row-2">
+                    <div class="form-group-cyber">
+                        <label class="form-cyber-label">Branch</label>
+                        <input type="text" id="editBranch" required>
+                    </div>
+                    <div class="form-group-cyber">
+                        <label class="form-cyber-label">Year / Semester</label>
+                        <input type="text" id="editYear" required>
+                    </div>
+                </div>
+                <div class="form-row-2">
+                    <div class="form-group-cyber">
+                        <label class="form-cyber-label">Hostel No</label>
+                        <input type="text" id="editHostel" required>
+                    </div>
+                    <div class="form-group-cyber">
+                        <label class="form-cyber-label">Room No</label>
+                        <input type="text" id="editRoom" required>
+                    </div>
+                </div>
+                <div class="form-group-cyber">
+                    <label class="form-cyber-label">Phone Number</label>
+                    <input type="tel" id="editPhone" required>
+                </div>
+                <div class="form-group-cyber">
+                    <label class="form-cyber-label">Email Address</label>
+                    <input type="email" id="editEmail" required>
+                </div>
+                <button type="submit" class="btn-auth-submit">SAVE CHANGES</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-wrapper"></div>
+
+    <!-- Profile Logic Script -->
+    <script src="profile.js"></script>
+</body>
+</html>
