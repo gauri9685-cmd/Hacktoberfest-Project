@@ -360,7 +360,7 @@ function togglePriceField(listingType) {
     }
 }
 
-function processItemUpload() {
+async function processItemUpload() {
     const name = document.getElementById('newItemName').value.trim();
     const category = document.getElementById('newItemCategory').value;
     const type = document.getElementById('newItemListingType').value;
@@ -378,6 +378,25 @@ function processItemUpload() {
         return;
     }
 
+    const user = getUserProfile();
+    const priceFormatted = type === 'sell' ? `₹${price}` : 'Free / Borrow';
+
+    // Upload to Supabase Database
+    if (typeof DatabaseService !== 'undefined') {
+        await DatabaseService.addMarketplaceItem({
+            title: name,
+            category: category,
+            description: desc,
+            price: priceFormatted,
+            condition: 'Good',
+            image_url: selectedPhoto,
+            seller_name: user.name || 'Campus Student',
+            seller_phone: phone || user.phone || '',
+            seller_hostel: location || user.hostel || 'Hostel Campus',
+            seller_roll: user.roll || ''
+        });
+    }
+
     const newItem = {
         id: `upload-${Date.now()}`,
         name: name,
@@ -391,7 +410,7 @@ function processItemUpload() {
         image: selectedPhoto
     };
 
-    // 1. Save to User's Uploaded Items
+    // 1. Save to User's Uploaded Items locally
     const myItems = getMyUploadedItems();
     myItems.unshift(newItem);
     saveMyUploadedItems(myItems);
@@ -404,7 +423,7 @@ function processItemUpload() {
     // 3. Close modal & Notify user
     closeUploadItemModal();
     document.getElementById('uploadItemForm').reset();
-    showToast(`✓ "${name}" uploaded successfully and published!`, 'success');
+    showToast(`✓ "${name}" uploaded to Supabase & published to Marketplace!`, 'success');
 }
 
 // ----------------------------------------------------------------------------

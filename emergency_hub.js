@@ -110,12 +110,23 @@ document.addEventListener('DOMContentLoaded', () => {
     renderFrame42RespondersList();
 });
 
-function initUserSession() {
+async function initUserSession() {
     let user = null;
     try {
         const stored = localStorage.getItem('safeCampusUser');
         if (stored) user = JSON.parse(stored);
     } catch(e) {}
+
+    if (user && user.roll && typeof DatabaseService !== 'undefined') {
+        try {
+            const dbProfile = await DatabaseService.getProfile(user.roll);
+            if (!dbProfile) {
+                localStorage.removeItem('safeCampusUser');
+                localStorage.removeItem('safeCampusUserProfile');
+                user = null;
+            }
+        } catch(e) {}
+    }
 
     const initial = (user && user.name) ? user.name.charAt(0).toUpperCase() : 'G';
     
@@ -180,11 +191,19 @@ function goToSlide(idx) { showSlide(idx); startSlideTimer(); }
 // ----------------------------------------------------------------------------
 // 3. POINT 2: EMERGENCY CONTACTS DIRECTORY (DYNAMIC RENDERER & SCROLLBAR)
 // ----------------------------------------------------------------------------
-function renderEmergencyContactsDirectory() {
+async function renderEmergencyContactsDirectory() {
     const container = document.getElementById('contactsDirectoryContainer');
     if (!container) return;
 
-    container.innerHTML = CAMPUS_EMERGENCY_CONTACTS.map(contact => {
+    let contacts = CAMPUS_EMERGENCY_CONTACTS;
+    if (typeof DatabaseService !== 'undefined') {
+        const dbContacts = await DatabaseService.getEmergencyContacts();
+        if (dbContacts && dbContacts.length > 0) {
+            contacts = dbContacts;
+        }
+    }
+
+    container.innerHTML = contacts.map(contact => {
         const glowClass = contact.accent === 'magenta' ? 'magenta-glow-card' : 'cyan-glow-card';
         const btnClass = contact.accent === 'magenta' ? 'magenta-btn' : 'cyan-btn';
 
@@ -192,12 +211,12 @@ function renderEmergencyContactsDirectory() {
             <div class="contact-card ${glowClass}">
                 <div class="contact-card-info">
                     <span class="contact-name">${escapeHTML(contact.name)}</span>
-                    <span class="contact-desc">${escapeHTML(contact.desc)}</span>
+                    <span class="contact-desc">${escapeHTML(contact.desc || contact.description)}</span>
                     <span class="contact-phone-number">${escapeHTML(contact.phone)}</span>
                 </div>
                 <div class="contact-card-actions">
                     <a href="tel:${contact.phone.replace(/[^0-9+]/g, '')}" class="btn-contact-call ${btnClass}">
-                        <span>📞</span> ${contact.callLabel}
+                        <span>📞</span> ${contact.call_label || contact.callLabel || 'Call'}
                     </a>
                     <button class="btn-contact-copy" onclick="copyContactNumber('${contact.phone}')" title="Copy number">
                         📋
@@ -239,7 +258,7 @@ function closeReportIncidentModal() {
     if (modal) modal.classList.remove('active');
 }
 
-function submitIncidentReport() {
+async function submitIncidentReport() {
     const categoryElem = document.getElementById('incidentCategory');
     const locElem = document.getElementById('incidentLocation');
     const detailsElem = document.getElementById('incidentDetails');
@@ -259,6 +278,17 @@ function submitIncidentReport() {
 
     const reportRef = `INC-${Date.now().toString().slice(-6)}`;
     
+    // Save to Supabase Database
+    if (typeof DatabaseService !== 'undefined') {
+        await DatabaseService.submitIncident({
+            category: category,
+            location: location,
+            details: details,
+            has_gps: isGps,
+            is_anonymous: isAnonymous
+        });
+    }
+
     // Save locally
     try {
         const existing = JSON.parse(localStorage.getItem('safeCampusIncidents') || '[]');
@@ -438,27 +468,34 @@ function sendWellnessMessage() {
     }, 550);
 }
 
-function generateWellnessAIReply(query, msgContainer) {
-    const lower = query.toLowerCase();
-    let reply = "";
+// Wellness AI Chat History
+let wellnessChatHistory = [];
 
-    if (lower.includes('headache') || lower.includes('fever') || lower.includes('temperature')) {
-        reply = "For mild fever or headaches, stay well-hydrated with clean water, rest in a quiet well-ventilated room, and monitor your temperature. If fever exceeds 100°F (37.8°C) or lasts over 24 hours, visit the BIT Sindri Health Center or contact on-call doctor at +91 9431102934.";
-    } else if (lower.includes('stomach') || lower.includes('vomit') || lower.includes('food') || lower.includes('pain')) {
-        reply = "Avoid spicy mess food, drink electrolyte-rich fluids (ORS or coconut water), and rest. If abdominal pain is sharp or persists with vomiting, please visit the campus dispensary immediately.";
-    } else if (lower.includes('cold') || lower.includes('cough') || lower.includes('throat')) {
-        reply = "Warm water gargles, steam inhalation, and hot water with ginger/honey offer good relief. Keep warm and rest your voice. If coughing lasts more than 3 days, get checked at the campus clinic.";
-    } else if (lower.includes('exam') || lower.includes('anxious') || lower.includes('anxiety') || lower.includes('stress')) {
-        reply = "Exam stress is very understandable, but remember your mental well-being comes first. Try breaking revision into 25-minute Pomodoro focus blocks with 5-minute breather walks. Take 3 deep diaphragmatic breaths right now. You can handle this step-by-step.";
-    } else if (lower.includes('sleep') || lower.includes('tired') || lower.includes('exhausted') || lower.includes('insomnia')) {
-        reply = "Quality sleep powers your memory and immune system. Turn off bright screens 30 minutes before bed, keep your room well-ventilated, and avoid tea/coffee after 6 PM. If fatigue continues, speak with the campus counselor.";
-    } else if (lower.includes('counselor') || lower.includes('appointment') || lower.includes('doctor') || lower.includes('health center')) {
-        reply = "You can speak with our Student Wellness Cell Counselor confidentially at +91 9835123490 or visit the Health Center near Central Gate. Consultations are completely free and private for all registered students.";
-    } else if (lower.includes('homesick') || lower.includes('alone') || lower.includes('lonely') || lower.includes('hostel')) {
-        reply = "Hostel life can sometimes feel overwhelming. Talking with a friend, calling home, or going for an evening walk around campus grounds can help ground you. You are never alone here—SafeCampus is always here for you.";
+async function generateWellnessAIReply(query, msgContainer) {
+    // Show typing bubble
+    const typingId = `wellness-typing-${Date.now()}`;
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'frame36-ai-bubble';
+    typingDiv.id = typingId;
+    typingDiv.style.fontStyle = 'italic';
+    typingDiv.style.opacity = '0.7';
+    typingDiv.innerText = 'Thinking...';
+    msgContainer.appendChild(typingDiv);
+    msgContainer.scrollTop = msgContainer.scrollHeight;
+
+    let reply = "";
+    if (typeof queryHealthAI !== 'undefined') {
+        reply = await queryHealthAI(query, wellnessChatHistory);
     } else {
-        reply = "Thank you for reaching out. Remember that whatever challenges you're facing on campus, taking a moment to breathe, rest, and speak with trusted mentors makes all the difference. How else can I assist your health and well-being today?";
+        reply = "Stay well-hydrated, take rest in a quiet room, and remember that for any health concerns or checkups, the BIT Sindri Health Center is open daily.";
     }
+
+    // Remove typing bubble
+    document.getElementById(typingId)?.remove();
+
+    // Track history
+    wellnessChatHistory.push({ role: "user", content: query });
+    wellnessChatHistory.push({ role: "assistant", content: reply });
 
     const aiMsgDiv = document.createElement('div');
     aiMsgDiv.className = 'frame36-ai-bubble';

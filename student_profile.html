@@ -212,8 +212,12 @@
         </div>
     </main>
 
+    <!-- Supabase JS Client & Database Config -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js?v=2.0"></script>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             let profile = {
                 name: "Rita Kumari",
                 roll: "21/IT/042",
@@ -231,6 +235,19 @@
                 const authUser = localStorage.getItem('safeCampusUser');
                 if (authUser) profile = Object.assign(profile, JSON.parse(authUser));
             } catch(e) {}
+
+            // Load live profile from Supabase
+            if (typeof DatabaseService !== 'undefined' && profile.roll) {
+                const dbProfile = await DatabaseService.getProfile(profile.roll);
+                if (dbProfile) {
+                    profile.name = dbProfile.full_name || profile.name;
+                    profile.branch = dbProfile.branch || profile.branch;
+                    profile.hostel = dbProfile.hostel || profile.hostel;
+                    profile.room = dbProfile.room_number || profile.room;
+                    profile.phone = dbProfile.phone || profile.phone;
+                    profile.email = dbProfile.email || profile.email;
+                }
+            }
 
             document.getElementById('displayStudentName').innerText = profile.name;
             document.getElementById('displayStudentRoll').innerText = profile.roll || "21/IT/042";

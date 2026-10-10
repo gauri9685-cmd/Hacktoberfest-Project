@@ -25,30 +25,60 @@ const UserAuthManager = {
 
     logout: function() {
         localStorage.removeItem('safeCampusUser');
+        localStorage.removeItem('safeCampusUserProfile');
         window.location.reload();
     }
 };
 
-// Initialize UI on page load
+// Initialize UI on page load — also clear any stale login sessions
 document.addEventListener('DOMContentLoaded', () => {
+    // ONE-TIME auto-clear: Remove stale login sessions and old registrations from previous tests.
+    const AUTH_VERSION = 'v3_strict_auth_fix';
+    if (localStorage.getItem('safeCampusAuthVersion') !== AUTH_VERSION) {
+        console.log('[AUTH] Upgrading auth system to v3 — clearing old local cache...');
+        // Clear all safeCampus localStorage entries
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('safeCampus')) {
+                localStorage.removeItem(key);
+            }
+        });
+        localStorage.setItem('safeCampusAuthVersion', AUTH_VERSION);
+    }
     updateUIAuthStatus();
 });
 
 /* Update top bar button to either LOG IN text or PROFILE icon button */
-function updateUIAuthStatus() {
+async function updateUIAuthStatus() {
     const user = UserAuthManager.getUser();
     const loginHeaderBtn = document.getElementById('loginHeaderBtn');
 
     if (user && loginHeaderBtn) {
+        // Asynchronously verify if the logged-in user actually exists in Supabase DB
+        if (typeof DatabaseService !== 'undefined' && user.roll) {
+            try {
+                const dbProfile = await DatabaseService.getProfile(user.roll);
+                if (!dbProfile) {
+                    // Profile does NOT exist in Supabase — purge fake/stale session!
+                    console.warn(`[AUTH] Session user "${user.roll}" not found in Supabase profiles. Purging stale session.`);
+                    localStorage.removeItem('safeCampusUser');
+                    localStorage.removeItem('safeCampusUserProfile');
+                    updateUIAuthStatus();
+                    return;
+                }
+            } catch(e) {}
+        }
+
         // Logged in mode: Render Circular Profile icon button matching Desktop-2 / Wireframe
         const initial = (user.name && user.name.trim()) ? user.name.trim().charAt(0).toUpperCase() : 'G';
-        loginHeaderBtn.innerHTML = `<span class="user-circle-avatar">${escapeHTML(initial)}</span>`;
+        loginHeaderBtn.innerHTML = `<span class="user-circle-avatar" style="font-size: 1.2rem; font-weight: 900; line-height: 1;">${escapeHTML(initial)}</span>`;
         loginHeaderBtn.className = 'btn-profile-circular';
-        loginHeaderBtn.title = `Profile: ${escapeHTML(user.name)}`;
+        loginHeaderBtn.title = `Profile: ${escapeHTML(user.name)} (${escapeHTML(user.roll || '')})`;
+        loginHeaderBtn.onclick = handleHeaderAuthClick;
     } else if (loginHeaderBtn) {
         // Logged out mode: Standard LOG IN button
         loginHeaderBtn.innerText = 'LOG IN';
         loginHeaderBtn.className = 'btn-login-cyber';
+        loginHeaderBtn.onclick = handleHeaderAuthClick;
     }
 }
 
@@ -78,48 +108,153 @@ function handlePortalClick(targetFeature, targetUrl) {
     } else {
         // If logged out / no account, set intent and open auth modal
         pendingRedirectIntent = targetFeature; // 'marketplace' or 'hub'
-        showToast(`Log in or Sign up to access ${targetFeature}.`, 'info');
+        showToast(`Please log in or sign up to access ${targetFeature}.`, 'info');
         openAuthModal('login');
     }
 }
 
-/* Process Login Form Submission with 3-Way Redirect Logic */
-function processLogin() {
-    const name = document.getElementById('loginName').value.trim();
-    const roll = document.getElementById('loginRoll').value.trim();
+/* Process Login Form Submission - ONLY ALLOW IF ACCOUNT ALREADY EXISTS */
+async function processLogin() {
+    const nameInput = document.getElementById('loginName').value.trim();
+    const rollInput = document.getElementById('loginRoll').value.trim();
 
-    if (!name || !roll) return;
+    if (!nameInput || !rollInput) {
+        showToast('Please enter both your name and roll number.', 'info');
+        return;
+    }
 
-    // Save User Session
-    UserAuthManager.setUser({
-        name: name,
-        roll: roll,
-        branch: 'IT',
-        email: `${roll.toLowerCase()}@bitsindri.ac.in`,
+    const btnSubmit = document.querySelector('#loginFormView button[type="submit"]');
+    if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.innerText = 'Verifying...'; }
+    showToast('Verifying student account...', 'info');
+
+    // 1. Check if profile exists in Supabase (primary source of truth)
+    let existingProfile = null;
+    if (typeof DatabaseService !== 'undefined') {
+        existingProfile = await DatabaseService.getProfile(rollInput);
+    }
+
+    // 2. Local offline fallback: ONLY check dedicated registration key matching exact roll number
+    // (Never use the active login session key safeCampusUser for authentication proof)
+    if (!existingProfile) {
+        try {
+            const registeredData = localStorage.getItem('safeCampusRegistered_' + rollInput.toLowerCase());
+            if (registeredData) {
+                const reg = JSON.parse(registeredData);
+                if (reg && reg.roll && reg.roll.toLowerCase() === rollInput.toLowerCase()) {
+                    existingProfile = {
+                        full_name: reg.name,
+                        roll_number: reg.roll,
+                        branch: reg.branch,
+                        email: reg.email,
+                        phone: reg.phone,
+                        hostel: reg.hostel,
+                        room_number: reg.room,
+                        photo_url: reg.photo
+                    };
+                }
+            }
+        } catch(e) {}
+    }
+
+    if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.innerText = 'LOG IN'; }
+
+    // 3. Strict Check: If no account found anywhere — block login!
+    if (!existingProfile) {
+        showToast(`⚠️ No account found with Roll No "${rollInput}". Please sign up first to create your account!`, 'info');
+        switchAuthView('signup');
+        const signupName = document.getElementById('signupFullName');
+        const signupRoll = document.getElementById('signupRoll');
+        if (signupName) signupName.value = nameInput;
+        if (signupRoll) signupRoll.value = rollInput;
+        return;
+    }
+
+    // 4. Account found — load stored data and log in
+    const userData = {
+        name: existingProfile.full_name || nameInput,
+        roll: existingProfile.roll_number || rollInput,
+        branch: existingProfile.branch || 'Engineering',
+        email: existingProfile.email || `${rollInput.toLowerCase()}@bitsindri.ac.in`,
+        phone: existingProfile.phone || '',
+        hostel: existingProfile.hostel || 'Hostel Campus',
+        room: existingProfile.room_number || '',
+        photo: existingProfile.photo_url || '',
         loggedInAt: new Date().toISOString()
-    });
+    };
+
+    UserAuthManager.setUser(userData);
+    localStorage.setItem('safeCampusUserProfile', JSON.stringify(userData));
+
+    // Update UI instantly with first letter of name
+    updateUIAuthStatus();
 
     closeAuthModal();
-    executePostAuthAction(name);
+    executePostAuthAction(userData.name);
 }
 
-/* Process Sign Up Form Submission with 3-Way Redirect Logic */
-function processSignup() {
+/* Process Sign Up Form Submission - CREATE NEW ACCOUNT */
+async function processSignup() {
     const name = document.getElementById('signupFullName').value.trim();
     const roll = document.getElementById('signupRoll').value.trim();
     const branch = document.getElementById('signupBranch').value.trim();
     const email = document.getElementById('signupEmail').value.trim();
+    const phone = document.getElementById('signupPhone').value.trim();
+    const hostel = document.getElementById('signupHostel').value.trim();
+    const room = document.getElementById('signupRoom').value.trim();
 
-    if (!name || !roll || !email) return;
+    if (!name || !roll || !email) {
+        showToast('Please fill in your name, roll number, and email.', 'info');
+        return;
+    }
 
-    // Save User Session
-    UserAuthManager.setUser({
+    const btnSubmit = document.querySelector('#signupFormView button[type="submit"]');
+    if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.innerText = 'Creating...'; }
+    showToast('Creating your student account...', 'info');
+
+    // 1. Check if an account already exists with this Roll Number
+    const supabaseReady = (typeof DatabaseService !== 'undefined' && typeof supabaseClient !== 'undefined' && supabaseClient !== null);
+    if (supabaseReady) {
+        const checkExisting = await DatabaseService.getProfile(roll);
+        if (checkExisting) {
+            if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.innerText = 'REGISTER ACCOUNT'; }
+            showToast(`An account with Roll No "${roll}" already exists! Please log in instead.`, 'info');
+            switchAuthView('login');
+            const loginRoll = document.getElementById('loginRoll');
+            const loginName = document.getElementById('loginName');
+            if (loginRoll) loginRoll.value = roll;
+            if (loginName) loginName.value = checkExisting.full_name || name;
+            return;
+        }
+    }
+
+    const userData = {
         name: name,
         roll: roll,
         branch: branch || 'Engineering',
         email: email,
+        phone: phone || '',
+        hostel: hostel || 'Hostel Campus',
+        room: room || '',
+        photo: '',
         loggedInAt: new Date().toISOString()
-    });
+    };
+
+    // Save session (current login)
+    UserAuthManager.setUser(userData);
+    localStorage.setItem('safeCampusUserProfile', JSON.stringify(userData));
+
+    // Save dedicated registration record (keyed by roll number — used as offline login fallback)
+    localStorage.setItem('safeCampusRegistered_' + roll.toLowerCase(), JSON.stringify(userData));
+
+    // Save to Supabase Database
+    if (supabaseReady) {
+        await DatabaseService.saveProfile(userData);
+    }
+
+    if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.innerText = 'REGISTER ACCOUNT'; }
+
+    // Update UI Header instantly with the first letter of name!
+    updateUIAuthStatus();
 
     closeAuthModal();
     executePostAuthAction(name);

@@ -133,23 +133,67 @@ const MARKETPLACE_DATABASE = [
 let currentActiveItemId = null;
 let activeCategoryFilter = "all";
 
+// Live items cache
+let liveMarketplaceItems = [...MARKETPLACE_DATABASE];
+
 // ----------------------------------------------------------------------------
 // 2. INITIALIZATION
 // ----------------------------------------------------------------------------
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     initUserSession();
     initBannerSlider();
-    renderMarketplaceCards();
+    await loadMarketplaceItemsFromDB();
     initCarouselAutoMovement();
 });
 
+async function loadMarketplaceItemsFromDB() {
+    if (typeof DatabaseService !== 'undefined') {
+        const dbItems = await DatabaseService.getMarketplaceItems();
+        if (dbItems && dbItems.length > 0) {
+            // Map Supabase DB items to marketplace format
+            const mapped = dbItems.map(item => ({
+                id: item.id,
+                name: item.title,
+                category: item.category,
+                shortDesc: item.description ? (item.description.length > 75 ? item.description.substring(0, 75) + '...' : item.description) : 'Available for campus sharing',
+                fullDesc: item.description || 'Campus student resource.',
+                image: item.image_url || 'item_calculator.jpg',
+                lenderName: item.seller_name || 'Campus Student',
+                lenderRoll: item.seller_roll || 'Student',
+                lenderHostel: item.seller_hostel || 'Hostel Campus',
+                lenderRoom: 'Hostel Room',
+                availabilityPeriod: item.price || 'Available Now',
+                phone: item.seller_phone || '9437543796',
+                email: 'student@bitsindri.ac.in',
+                tags: [item.title.toLowerCase(), item.category.toLowerCase()]
+            }));
+
+            // Merge with static database (keeping unique items)
+            const dbIds = new Set(mapped.map(m => m.id));
+            liveMarketplaceItems = [...mapped, ...MARKETPLACE_DATABASE.filter(m => !dbIds.has(m.id))];
+        }
+    }
+    renderMarketplaceCards();
+}
+
 // Sync User Profile info in Top Right Circle
-function initUserSession() {
+async function initUserSession() {
     let user = null;
     try {
         const stored = localStorage.getItem('safeCampusUser');
         if (stored) user = JSON.parse(stored);
     } catch(e) {}
+
+    if (user && user.roll && typeof DatabaseService !== 'undefined') {
+        try {
+            const dbProfile = await DatabaseService.getProfile(user.roll);
+            if (!dbProfile) {
+                localStorage.removeItem('safeCampusUser');
+                localStorage.removeItem('safeCampusUserProfile');
+                user = null;
+            }
+        } catch(e) {}
+    }
 
     const badge = document.getElementById('userInitialBadge');
     if (badge) {
@@ -259,9 +303,9 @@ function renderMarketplaceCards() {
 
     const requestedList = getRequestedItems();
     
-    let filtered = MARKETPLACE_DATABASE;
+    let filtered = liveMarketplaceItems;
     if (activeCategoryFilter !== 'all') {
-        filtered = MARKETPLACE_DATABASE.filter(item => item.category.toLowerCase().includes(activeCategoryFilter.toLowerCase()));
+        filtered = liveMarketplaceItems.filter(item => item.category.toLowerCase().includes(activeCategoryFilter.toLowerCase()));
     }
 
     if (filtered.length === 0) {
@@ -464,7 +508,7 @@ function triggerSearch() {
 // 6. FRAME 12 ITEM DETAILS POPUP MODAL
 // ----------------------------------------------------------------------------
 function openItemDetails(itemId) {
-    const item = MARKETPLACE_DATABASE.find(it => it.id === itemId);
+    const item = liveMarketplaceItems.find(it => it.id === itemId) || MARKETPLACE_DATABASE.find(it => it.id === itemId);
     if (!item) return;
 
     currentActiveItemId = itemId;
@@ -606,43 +650,69 @@ function sendAIChatMessage() {
     }, 600);
 }
 
-function generateAIResponse(query, msgContainer) {
-    const lower = query.toLowerCase();
-    
-    // Find matching items from DB
-    const matchingItems = MARKETPLACE_DATABASE.filter(item => 
-        lower.includes(item.name.toLowerCase()) ||
-        item.tags.some(t => lower.includes(t)) ||
-        lower.includes(item.category.toLowerCase())
-    );
+// Marketplace Chat Conversation History for Groq
+let marketplaceChatHistory = [];
 
-    let replyText = "";
-    let itemSuggestionHTML = "";
+async function generateAIResponse(query, msgContainer) {
+    // Show typing indicator
+    const typingId = `typing-${Date.now()}`;
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'chat-message ai-message';
+    typingDiv.id = typingId;
+    typingDiv.innerHTML = `
+        <div class="chat-bubble ai-bubble" style="font-style: italic; color: #94a3b8;">
+            🔍 Searching campus inventory...
+        </div>
+    `;
+    msgContainer.appendChild(typingDiv);
+    msgContainer.scrollTop = msgContainer.scrollHeight;
 
-    if (matchingItems.length > 0) {
-        const topItem = matchingItems[0];
-        replyText = `I found **${topItem.name}** available from ${topItem.lenderName} in ${topItem.lenderHostel}! Here are the details:`;
-        itemSuggestionHTML = `
-            <div class="chat-product-suggestion">
-                <strong>${escapeHTML(topItem.name)}</strong><br>
-                <span style="color:#94a3b8; font-size:0.8rem;">${escapeHTML(topItem.shortDesc)}</span><br>
-                <button class="chat-suggestion-btn" onclick="openItemDetails('${topItem.id}')">View Details & Request</button>
+    let aiResult = null;
+    if (typeof queryMarketplaceAI !== 'undefined') {
+        aiResult = await queryMarketplaceAI(query, marketplaceChatHistory);
+    } else {
+        aiResult = {
+            text: "Hello! Try asking for items like scientific calculators, engineering drafters, lab coats, or textbooks.",
+            items: []
+        };
+    }
+
+    // Remove typing indicator
+    document.getElementById(typingId)?.remove();
+
+    // Track history
+    marketplaceChatHistory.push({ role: "user", content: query });
+    marketplaceChatHistory.push({ role: "assistant", content: aiResult.text });
+
+    // Render item cards if returned
+    let itemsHTML = "";
+    if (aiResult.items && aiResult.items.length > 0) {
+        itemsHTML = `
+            <div class="ai-chat-items-list" style="margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                ${aiResult.items.map(item => `
+                    <div class="ai-item-mini-card" style="background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(0, 240, 255, 0.4); border-radius: 10px; padding: 0.65rem 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.65rem;">
+                            <img src="${item.image_url || 'item_calculator.jpg'}" alt="${escapeHTML(item.title)}" style="width: 36px; height: 36px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(0,240,255,0.3);" onerror="this.src='item_calculator.jpg'">
+                            <div style="display: flex; flex-direction: column;">
+                                <span style="font-weight: bold; color: #ffffff; font-size: 0.85rem;">${escapeHTML(item.title)}</span>
+                                <span style="color: #00f0ff; font-size: 0.78rem; font-weight: 600;">${escapeHTML(item.price || 'Free / Borrow')} • 📍 ${escapeHTML(item.hostel || 'Campus')}</span>
+                            </div>
+                        </div>
+                        <button class="ai-mini-view-btn" onclick="openItemDetails('${item.id}')" style="background: #00f0ff; color: #070a12; border: none; padding: 0.35rem 0.75rem; border-radius: 6px; font-weight: 700; font-size: 0.75rem; cursor: pointer; white-space: nowrap;">
+                            View Item ➔
+                        </button>
+                    </div>
+                `).join('')}
             </div>
         `;
-    } else if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
-        replyText = "Hello! Looking for any specific item today? Try asking for calculators, lab coats, pen drives, cycles or textbooks!";
-    } else if (lower.includes('lend') || lower.includes('share') || lower.includes('sell')) {
-        replyText = "To put your own items up for sharing, click your Profile icon on the top right to create a new resource listing!";
-    } else {
-        replyText = `I checked the campus inventory for "${escapeHTML(query)}". You can borrow similar items from our Available Items carousel or post a campus request.`;
     }
 
     const aiMsgDiv = document.createElement('div');
     aiMsgDiv.className = 'chat-message ai-message';
     aiMsgDiv.innerHTML = `
         <div class="chat-bubble ai-bubble">
-            ${replyText}
-            ${itemSuggestionHTML}
+            <p style="margin: 0; line-height: 1.45;">${escapeHTML(aiResult.text).replace(/\n/g, '<br>')}</p>
+            ${itemsHTML}
         </div>
         <span class="chat-timestamp">${getCurrentTimeStr()}</span>
     `;

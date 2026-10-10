@@ -205,9 +205,12 @@
 
     <div id="toastContainer" class="toast-wrapper"></div>
 
-    <script src="marketplace.js"></script>
+    <!-- Supabase JS Client & Database Config -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js?v=2.0"></script>
+    <script src="marketplace.js?v=2.0"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const query = urlParams.get('q') || '';
             
@@ -215,18 +218,46 @@
             document.getElementById('marketplaceSearchInput').value = query;
 
             const grid = document.getElementById('searchResultsGrid');
-            const matches = MARKETPLACE_DATABASE.filter(item => 
+
+            let allItems = MARKETPLACE_DATABASE;
+            if (typeof DatabaseService !== 'undefined') {
+                const dbItems = await DatabaseService.getMarketplaceItems('all', query);
+                if (dbItems && dbItems.length > 0) {
+                    const mapped = dbItems.map(item => ({
+                        id: item.id,
+                        name: item.title,
+                        category: item.category,
+                        shortDesc: item.description || 'Campus student item',
+                        fullDesc: item.description || '',
+                        image: item.image_url || 'item_calculator.jpg',
+                        lenderName: item.seller_name || 'Campus Student',
+                        lenderHostel: item.seller_hostel || 'Hostel Campus',
+                        lenderRoom: 'Hostel Room',
+                        availabilityPeriod: item.price || 'Available',
+                        phone: item.seller_phone || '',
+                        email: 'student@bitsindri.ac.in',
+                        tags: [item.title.toLowerCase()]
+                    }));
+                    allItems = [...mapped, ...MARKETPLACE_DATABASE];
+                }
+            }
+
+            const matches = allItems.filter(item => 
+                !query ||
                 item.name.toLowerCase().includes(query.toLowerCase()) ||
                 item.shortDesc.toLowerCase().includes(query.toLowerCase()) ||
                 item.category.toLowerCase().includes(query.toLowerCase()) ||
-                item.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
+                (item.tags && item.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase())))
             );
 
-            document.getElementById('resultsCountBadge').innerText = `(${matches.length} items found)`;
+            // Deduplicate by ID
+            const uniqueMatches = Array.from(new Map(matches.map(item => [item.id, item])).values());
+
+            document.getElementById('resultsCountBadge').innerText = `(${uniqueMatches.length} items found)`;
 
             const requestedList = getRequestedItems();
 
-            if (matches.length === 0) {
+            if (uniqueMatches.length === 0) {
                 grid.innerHTML = `
                     <div style="grid-column: 1/-1; padding: 3rem; text-align: center; color: #94a3b8;">
                         <h3>No direct items matched "${query}".</h3>
@@ -234,7 +265,7 @@
                     </div>
                 `;
             } else {
-                grid.innerHTML = matches.map(item => {
+                grid.innerHTML = uniqueMatches.map(item => {
                     const isReq = requestedList.includes(item.id);
                     return `
                         <div class="item-card" style="width: 100%;" data-id="${item.id}">

@@ -140,12 +140,12 @@ let currentActiveItem = null;
 // ----------------------------------------------------------------------------
 // INITIALIZATION
 // ----------------------------------------------------------------------------
-document.addEventListener('DOMContentLoaded', () => {
-    initSellerDataFromURL();
+document.addEventListener('DOMContentLoaded', async () => {
+    await initSellerDataFromURL();
     renderSellerProfile();
 });
 
-function initSellerDataFromURL() {
+async function initSellerDataFromURL() {
     const params = new URLSearchParams(window.location.search);
     const sellerParam = params.get('seller');
     const itemParam = params.get('item');
@@ -160,6 +160,45 @@ function initSellerDataFromURL() {
                 break;
             }
         }
+    }
+
+    // Try finding seller in Supabase
+    if (sellerParam && typeof DatabaseService !== 'undefined' && supabaseClient) {
+        try {
+            const { data: dbItems } = await supabaseClient
+                .from('marketplace_items')
+                .select('*')
+                .ilike('seller_name', `%${sellerParam}%`);
+
+            if (dbItems && dbItems.length > 0) {
+                const first = dbItems[0];
+                currentSeller = {
+                    name: first.seller_name,
+                    roll: first.seller_roll || 'Student',
+                    branch: 'BIT Sindri Engineering',
+                    year: 'B.Tech Student',
+                    hostel: first.seller_hostel || 'Hostel Campus',
+                    room: 'Room',
+                    phone: first.seller_phone || '+91 9437543796',
+                    email: 'student@bitsindri.ac.in',
+                    trustRating: '⭐ 5.0 Verified Student',
+                    history: [
+                        { title: `Listed: ${first.title}`, meta: 'Active Campus Listing', date: 'Oct 2026', status: 'Active' }
+                    ],
+                    items: dbItems.map(d => ({
+                        id: d.id,
+                        name: d.title,
+                        category: d.category,
+                        type: 'free',
+                        shortDesc: d.description || '',
+                        fullDesc: d.description || '',
+                        image: d.image_url || 'item_calculator.jpg',
+                        availability: d.price || 'Available',
+                        location: d.seller_hostel || 'Hostel Campus'
+                    }))
+                };
+            }
+        } catch(e) {}
     }
 
     // Sync header profile initial
