@@ -19,18 +19,15 @@ function getGroqAPIKey() {
     return "";
 }
 
-const GROQ_MODEL = "llama-3.3-70b-versatile";
+const GROQ_MODEL = "qwen/qwen3.8-27b";
 
 async function callGroqAPI(payload) {
     const key = getGroqAPIKey();
-    let endpoint = "https://api.groq.com/openai/v1/chat/completions";
-    const headers = { "Content-Type": "application/json" };
-
-    if (key) {
-        headers["Authorization"] = `Bearer ${key}`;
-    } else {
-        endpoint = "/api/groq";
-    }
+    const endpoint = "https://api.groq.com/openai/v1/chat/completions";
+    const headers = { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${key}`
+    };
 
     const response = await fetch(endpoint, {
         method: "POST",
@@ -39,7 +36,9 @@ async function callGroqAPI(payload) {
     });
 
     if (!response.ok) {
-        throw new Error(`Groq API Error (${response.status}): ${response.statusText}`);
+        const errBody = await response.text();
+        console.error(`[Groq AI] API Error (${response.status}):`, errBody);
+        throw new Error(`Groq API Error (${response.status}): ${errBody}`);
     }
 
     return await response.json();
@@ -192,7 +191,7 @@ If no items are found:
             tools: MARKETPLACE_AI_TOOLS,
             tool_choice: "auto",
             temperature: 0.4,
-            max_tokens: 450
+            max_tokens: 200
         });
 
         const assistantMsg = initialData.choices[0].message;
@@ -223,7 +222,7 @@ If no items are found:
                 model: GROQ_MODEL,
                 messages: messages,
                 temperature: 0.5,
-                max_tokens: 350
+                max_tokens: 200
             });
 
             return {
@@ -274,7 +273,7 @@ Guidelines:
             model: GROQ_MODEL,
             messages: messages,
             temperature: 0.6,
-            max_tokens: 350
+            max_tokens: 200
         });
 
         return data.choices[0].message.content;
