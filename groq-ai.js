@@ -8,8 +8,42 @@
  * ============================================================================
  */
 
-const GROQ_API_KEY = (typeof process !== 'undefined' && process.env && process.env.GROQ_API_KEY) ? process.env.GROQ_API_KEY : (window.GROQ_API_KEY || "");
+function getGroqAPIKey() {
+    if (typeof process !== 'undefined' && process.env && process.env.GROQ_API_KEY) {
+        return process.env.GROQ_API_KEY;
+    }
+    if (typeof window !== 'undefined') {
+        if (window.GROQ_API_KEY) return window.GROQ_API_KEY;
+        if (localStorage.getItem('GROQ_API_KEY')) return localStorage.getItem('GROQ_API_KEY');
+    }
+    return "";
+}
+
 const GROQ_MODEL = "llama-3.3-70b-versatile";
+
+async function callGroqAPI(payload) {
+    const key = getGroqAPIKey();
+    let endpoint = "https://api.groq.com/openai/v1/chat/completions";
+    const headers = { "Content-Type": "application/json" };
+
+    if (key) {
+        headers["Authorization"] = `Bearer ${key}`;
+    } else {
+        endpoint = "/api/groq";
+    }
+
+    const response = await fetch(endpoint, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        throw new Error(`Groq API Error (${response.status}): ${response.statusText}`);
+    }
+
+    return await response.json();
+}
 
 // ----------------------------------------------------------------------------
 // 1. MARKETPLACE AI TOOL DEFINITIONS
@@ -152,27 +186,15 @@ If no items are found:
         ];
 
         // Step 1: Initial call to Groq
-        const initialRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${GROQ_API_KEY}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                model: GROQ_MODEL,
-                messages: messages,
-                tools: MARKETPLACE_AI_TOOLS,
-                tool_choice: "auto",
-                temperature: 0.4,
-                max_tokens: 450
-            })
+        const initialData = await callGroqAPI({
+            model: GROQ_MODEL,
+            messages: messages,
+            tools: MARKETPLACE_AI_TOOLS,
+            tool_choice: "auto",
+            temperature: 0.4,
+            max_tokens: 450
         });
 
-        if (!initialRes.ok) {
-            throw new Error(`Groq API Error: ${initialRes.status}`);
-        }
-
-        const initialData = await initialRes.json();
         const assistantMsg = initialData.choices[0].message;
 
         // Step 2: Handle Tool Calls
@@ -197,21 +219,13 @@ If no items are found:
                 content: JSON.stringify(matchedItems)
             });
 
-            const finalRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${GROQ_API_KEY}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    model: GROQ_MODEL,
-                    messages: messages,
-                    temperature: 0.5,
-                    max_tokens: 350
-                })
+            const finalData = await callGroqAPI({
+                model: GROQ_MODEL,
+                messages: messages,
+                temperature: 0.5,
+                max_tokens: 350
             });
 
-            const finalData = await finalRes.json();
             return {
                 text: finalData.choices[0].message.content,
                 items: matchedItems
@@ -256,25 +270,13 @@ Guidelines:
             { role: "user", content: userMessage }
         ];
 
-        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${GROQ_API_KEY}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                model: GROQ_MODEL,
-                messages: messages,
-                temperature: 0.6,
-                max_tokens: 350
-            })
+        const data = await callGroqAPI({
+            model: GROQ_MODEL,
+            messages: messages,
+            temperature: 0.6,
+            max_tokens: 350
         });
 
-        if (!response.ok) {
-            throw new Error(`Groq API Error: ${response.status}`);
-        }
-
-        const data = await response.json();
         return data.choices[0].message.content;
 
     } catch (err) {
