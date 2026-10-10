@@ -23,11 +23,15 @@ const GROQ_MODEL = "qwen/qwen3.8-27b";
 
 async function callGroqAPI(payload) {
     const key = getGroqAPIKey();
-    const endpoint = "https://api.groq.com/openai/v1/chat/completions";
-    const headers = { 
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${key}`
-    };
+    let endpoint = "https://api.groq.com/openai/v1/chat/completions";
+    const headers = { "Content-Type": "application/json" };
+
+    if (key) {
+        headers["Authorization"] = `Bearer ${key}`;
+    } else {
+        // Fallback to Vercel Serverless Function proxy (/api/groq) when key is not stored locally
+        endpoint = "/api/groq";
+    }
 
     const response = await fetch(endpoint, {
         method: "POST",
