@@ -20,8 +20,13 @@ function getGroqAPIKey() {
 }
 
 const GROQ_MODEL = "qwen/qwen3.8-27b";
+const GROQ_FALLBACK_MODELS = [
+    "qwen/qwen3.8-27b",
+    "openai/gpt-oss-20b",
+    "openai/gpt-oss-120b"
+];
 
-async function callGroqAPI(payload) {
+async function callGroqAPI(payload, modelIndex = 0) {
     const key = getGroqAPIKey();
     let endpoint = "https://api.groq.com/openai/v1/chat/completions";
     const headers = { "Content-Type": "application/json" };
@@ -29,23 +34,44 @@ async function callGroqAPI(payload) {
     if (key) {
         headers["Authorization"] = `Bearer ${key}`;
     } else {
-        // Fallback to Vercel Serverless Function proxy (/api/groq) when key is not stored locally
         endpoint = "/api/groq";
     }
 
-    const response = await fetch(endpoint, {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(payload)
-    });
+    // Assign current model from fallback chain if modelIndex > 0 or not explicitly set
+    const currentModel = GROQ_FALLBACK_MODELS[modelIndex] || payload.model || GROQ_MODEL;
+    const currentPayload = { ...payload, model: currentModel };
 
-    if (!response.ok) {
-        const errBody = await response.text();
-        console.error(`[Groq AI] API Error (${response.status}):`, errBody);
-        throw new Error(`Groq API Error (${response.status}): ${errBody}`);
+    try {
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(currentPayload)
+        });
+
+        if (!response.ok) {
+            const errBody = await response.text();
+            console.warn(`[Groq AI] Model "${currentModel}" returned status ${response.status}:`, errBody);
+
+            // If rate limited (429), token limit exceeded (400), or decommissioned (404), try next model in fallback list
+            if ((response.status === 429 || response.status === 400 || response.status === 404) && modelIndex + 1 < GROQ_FALLBACK_MODELS.length) {
+                const nextModel = GROQ_FALLBACK_MODELS[modelIndex + 1];
+                console.log(`⚡ [Groq AI] Automatically switching model from "${currentModel}" -> "${nextModel}"`);
+                return await callGroqAPI(payload, modelIndex + 1);
+            }
+
+            throw new Error(`Groq API Error (${response.status}): ${errBody}`);
+        }
+
+        return await response.json();
+    } catch (err) {
+        // If fetch error occurred and more fallback models are available, try next model
+        if (modelIndex + 1 < GROQ_FALLBACK_MODELS.length) {
+            const nextModel = GROQ_FALLBACK_MODELS[modelIndex + 1];
+            console.warn(`⚡ [Groq AI] Connection issue on "${currentModel}". Automatically switching to fallback model "${nextModel}"...`);
+            return await callGroqAPI(payload, modelIndex + 1);
+        }
+        throw err;
     }
-
-    return await response.json();
 }
 
 // ----------------------------------------------------------------------------
