@@ -319,18 +319,33 @@ function renderUploadedItems() {
     }).join('');
 }
 
-function deleteUploadedItem(itemId) {
-    if (!confirm('Are you sure you want to remove this item listing?')) return;
+async function deleteUploadedItem(itemId) {
+    if (!confirm('Are you sure you want to remove this item listing from campus marketplace & database?')) return;
 
     let items = getMyUploadedItems();
-    const removedItem = items.find(it => it.id === itemId);
-    items = items.filter(it => it.id !== itemId);
+    const removedItem = items.find(it => it.id === itemId || it.dbId === itemId);
+    items = items.filter(it => it.id !== itemId && it.dbId !== itemId);
     saveMyUploadedItems(items);
     renderUploadedItems();
 
+    const user = getUserProfile();
+
+    // Delete item permanently from Supabase Database
+    if (typeof DatabaseService !== 'undefined' && removedItem) {
+        try {
+            await DatabaseService.deleteMarketplaceItem(
+                removedItem.dbId || removedItem.id,
+                removedItem.name,
+                user ? user.roll : ''
+            );
+        } catch (e) {
+            console.error("Error deleting item from Supabase:", e);
+        }
+    }
+
     if (removedItem) {
         addHistoryEntry('uploaded', `Unlisted: ${removedItem.name}`, 'Removed from active listings', 'Completed');
-        showToast(`Item "${removedItem.name}" unlisted.`, 'info');
+        showToast(`Item "${removedItem.name}" deleted permanently from database!`, 'info');
     }
 }
 
@@ -381,9 +396,11 @@ async function processItemUpload() {
     const user = getUserProfile();
     const priceFormatted = type === 'sell' ? `₹${price}` : 'Free / Borrow';
 
+    let dbId = null;
+
     // Upload to Supabase Database
     if (typeof DatabaseService !== 'undefined') {
-        await DatabaseService.addMarketplaceItem({
+        const dbRes = await DatabaseService.addMarketplaceItem({
             title: name,
             category: category,
             description: desc,
@@ -395,10 +412,15 @@ async function processItemUpload() {
             seller_hostel: location || user.hostel || 'Hostel Campus',
             seller_roll: user.roll || ''
         });
+
+        if (dbRes && dbRes.data && dbRes.data.id) {
+            dbId = dbRes.data.id;
+        }
     }
 
     const newItem = {
         id: `upload-${Date.now()}`,
+        dbId: dbId,
         name: name,
         category: category,
         type: type,

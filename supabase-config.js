@@ -121,6 +121,45 @@ const DatabaseService = {
     },
 
     /**
+     * Delete a Marketplace Item completely from Supabase Database
+     */
+    async deleteMarketplaceItem(itemId, itemTitle = '', sellerRoll = '') {
+        const client = getSupabaseClient();
+        if (!client) return { success: false, error: "Database not connected" };
+
+        try {
+            // 1. Delete by exact Supabase primary key ID if available
+            if (itemId && !String(itemId).startsWith('upload-')) {
+                const { error } = await client
+                    .from('marketplace_items')
+                    .delete()
+                    .eq('id', itemId);
+
+                if (!error) {
+                    console.log(`⚡ [SafeCampus] Item deleted from Supabase by ID: ${itemId}`);
+                    return { success: true };
+                }
+            }
+
+            // 2. Fallback: match and delete by item title & optional seller_roll
+            if (itemTitle) {
+                let query = client.from('marketplace_items').delete().ilike('title', itemTitle.trim());
+                if (sellerRoll) {
+                    query = query.ilike('seller_roll', sellerRoll.trim());
+                }
+                const { error } = await query;
+                if (error) throw error;
+                console.log(`⚡ [SafeCampus] Item deleted from Supabase by Title: ${itemTitle}`);
+            }
+
+            return { success: true };
+        } catch (err) {
+            console.error("Error deleting marketplace item:", err);
+            return { success: false, error: err.message };
+        }
+    },
+
+    /**
      * Fetch Emergency Contacts from Supabase
      */
     async getEmergencyContacts() {
