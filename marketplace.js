@@ -738,12 +738,18 @@ function renderMarketplaceCards() {
     // Helper to generate HTML for one card
     const cardHTML = (item, index) => {
         const isReq = requestedList.includes(item.id);
+        const itemPrice = (item.price || '').trim();
+        const isFree = !itemPrice || itemPrice.toLowerCase().includes('free') || itemPrice.toLowerCase().includes('borrow');
+        const priceLabel = isFree ? '🎁 Free to Borrow' : `🏷️ ${escapeHTML(itemPrice)}`;
+        const priceClass = isFree ? 'price-free' : 'price-paid';
+
         return `
             <div class="item-card" data-id="${item.id}" data-idx="${index}">
                 <div class="item-card-image-wrap">
                     <img src="${item.image}" alt="${escapeHTML(item.name)}" class="item-card-img" onerror="this.src='banner_gadgets.jpg'">
                     <span class="item-card-badge">${escapeHTML(item.category)}</span>
                     <span class="item-card-status ${isReq ? 'requested' : ''}">${isReq ? 'Requested' : 'Available'}</span>
+                    <span class="item-card-price-badge ${priceClass}">${priceLabel}</span>
                 </div>
                 
                 <div class="item-card-body">

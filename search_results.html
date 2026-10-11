@@ -275,15 +275,20 @@
                         <p style="margin-top: 0.5rem;">Try searching for "calculator", "lab coat", "pen drive", "drafter", or "cycle".</p>
                     </div>
                 `;
-            } else {
                 grid.innerHTML = uniqueMatches.map(item => {
                     const isReq = requestedList.includes(item.id);
+                    const itemPrice = (item.price || '').trim();
+                    const isFree = !itemPrice || itemPrice.toLowerCase().includes('free') || itemPrice.toLowerCase().includes('borrow');
+                    const priceLabel = isFree ? '🎁 Free to Borrow' : `🏷️ ${escapeHTML(itemPrice)}`;
+                    const priceClass = isFree ? 'price-free' : 'price-paid';
+
                     return `
                         <div class="item-card" style="width: 100%;" data-id="${item.id}">
                             <div class="item-card-image-wrap">
                                 <img src="${item.image}" alt="${escapeHTML(item.name)}" class="item-card-img" onerror="this.src='banner_gadgets.jpg'">
                                 <span class="item-card-badge">${escapeHTML(item.category)}</span>
                                 <span class="item-card-status ${isReq ? 'requested' : ''}">${isReq ? 'Requested' : 'Available'}</span>
+                                <span class="item-card-price-badge ${priceClass}">${priceLabel}</span>
                             </div>
                             <div class="item-card-body">
                                 <h3 class="item-card-title">${escapeHTML(item.name)}</h3>
