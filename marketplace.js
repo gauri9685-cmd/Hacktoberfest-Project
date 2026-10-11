@@ -739,10 +739,17 @@ function renderMarketplaceCards() {
     const cardHTML = (item, index) => {
         const isReq = requestedList.includes(item.id);
         const rawPrice = (item.price || '').trim();
-        const numericPrice = rawPrice.replace(/[^0-9]/g, '');
-        const isFree = !rawPrice || rawPrice.toLowerCase().includes('free') || rawPrice.toLowerCase().includes('borrow') || !numericPrice;
-        const priceLabel = isFree ? 'Free to Borrow' : numericPrice;
-        const priceClass = isFree ? 'price-free' : 'price-paid';
+        const isFree = !rawPrice || rawPrice.toLowerCase().includes('free') || rawPrice.toLowerCase().includes('borrow');
+        
+        // Extract numeric digits if paid
+        let cleanInt = rawPrice.replace(/[^0-9]/g, '');
+        let priceLabel = 'Free to Borrow';
+        let priceClass = 'price-free';
+
+        if (!isFree && cleanInt) {
+            priceLabel = `&#8377;${cleanInt}`;
+            priceClass = 'price-paid';
+        }
 
         return `
             <div class="item-card" data-id="${item.id}" data-idx="${index}">

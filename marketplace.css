@@ -562,8 +562,8 @@
     background: rgba(11, 15, 25, 0.9);
     padding: 0.25rem 0.65rem;
     border-radius: 6px;
-    font-family: var(--font-heading);
-    font-size: 0.78rem;
+    font-family: var(--font-heading), 'Outfit', system-ui, sans-serif;
+    font-size: 0.8rem;
     font-weight: 800;
     letter-spacing: 0.5px;
     backdrop-filter: blur(4px);
