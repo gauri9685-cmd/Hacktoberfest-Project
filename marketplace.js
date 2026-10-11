@@ -738,9 +738,10 @@ function renderMarketplaceCards() {
     // Helper to generate HTML for one card
     const cardHTML = (item, index) => {
         const isReq = requestedList.includes(item.id);
-        const itemPrice = (item.price || '').trim();
-        const isFree = !itemPrice || itemPrice.toLowerCase().includes('free') || itemPrice.toLowerCase().includes('borrow');
-        const priceLabel = isFree ? '🎁 Free to Borrow' : `🏷️ ${escapeHTML(itemPrice)}`;
+        const rawPrice = (item.price || '').trim();
+        const numericPrice = rawPrice.replace(/[^0-9]/g, '');
+        const isFree = !rawPrice || rawPrice.toLowerCase().includes('free') || rawPrice.toLowerCase().includes('borrow') || !numericPrice;
+        const priceLabel = isFree ? 'Free to Borrow' : numericPrice;
         const priceClass = isFree ? 'price-free' : 'price-paid';
 
         return `
