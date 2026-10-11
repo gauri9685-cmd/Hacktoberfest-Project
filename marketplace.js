@@ -956,6 +956,23 @@ function openItemDetails(itemId) {
     document.getElementById('detailItemDesc').innerText = item.fullDesc;
     document.getElementById('detailLenderName').innerText = item.lenderName;
     document.getElementById('detailLocation').innerText = `${item.lenderRoom}, ${item.lenderHostel}`;
+
+    // Price / Borrowing Fee display
+    const priceElem = document.getElementById('detailPrice');
+    if (priceElem) {
+        const rawPrice = (item.price || '').trim();
+        const isFree = !rawPrice || rawPrice.toLowerCase().includes('free') || rawPrice.toLowerCase().includes('borrow');
+        const cleanInt = rawPrice.replace(/[^0-9]/g, '');
+
+        if (!isFree && cleanInt) {
+            priceElem.innerHTML = `&#8377;${cleanInt} <span style="font-size:0.8rem; color:#f59e0b; font-weight:normal;">(Selling)</span>`;
+            priceElem.style.color = '#fbbf24';
+        } else {
+            priceElem.innerHTML = `Free to Borrow <span style="font-size:0.8rem; color:#10b981; font-weight:normal;">(Zero Fee)</span>`;
+            priceElem.style.color = '#10b981';
+        }
+    }
+
     document.getElementById('detailAvailability').innerText = item.availabilityPeriod;
     document.getElementById('detailPhone').innerText = item.phone;
     document.getElementById('detailEmail').innerText = item.email;
