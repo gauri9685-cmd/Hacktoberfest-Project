@@ -346,5 +346,48 @@ const DatabaseService = {
                 await client.auth.signOut();
             } catch(e) {}
         }
+    },
+
+    /**
+     * Delete Student Profile & Associated Data
+     */
+    async deleteProfileAndAccount(email, rollNumber = '') {
+        const client = getSupabaseClient();
+        if (!client) return { success: false, error: "Database not connected" };
+
+        try {
+            // 1. Delete from profiles table by email
+            if (email) {
+                await client
+                    .from('profiles')
+                    .delete()
+                    .ilike('email', email.trim());
+            }
+
+            // 2. Also delete by roll number if provided
+            if (rollNumber) {
+                await client
+                    .from('profiles')
+                    .delete()
+                    .ilike('roll_number', rollNumber.trim());
+            }
+
+            // 3. Remove user's listed items if any
+            if (email || rollNumber) {
+                let itemsQuery = client.from('marketplace_items').delete();
+                if (rollNumber) {
+                    itemsQuery = itemsQuery.ilike('seller_roll', rollNumber.trim());
+                }
+                await itemsQuery;
+            }
+
+            // 4. Sign out from Supabase Auth
+            await client.auth.signOut();
+
+            return { success: true };
+        } catch(err) {
+            console.error("Error deleting account:", err);
+            return { success: false, error: err.message };
+        }
     }
 };

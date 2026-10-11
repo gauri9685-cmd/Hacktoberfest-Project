@@ -599,3 +599,37 @@
     color: white;
     box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
 }
+
+/* Delete Account Danger Zone */
+.profile-danger-zone {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px dashed rgba(239, 68, 68, 0.35);
+    display: flex;
+    justify-content: flex-start;
+}
+
+.btn-delete-account-cyber {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #f87171;
+    padding: 0.55rem 1rem;
+    border-radius: 8px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all var(--transition-smooth);
+}
+
+.btn-delete-account-cyber:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: #ef4444;
+    color: #fee2e2;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+    transform: translateY(-1px);
+}

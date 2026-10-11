@@ -479,6 +479,63 @@ function handleLogout() {
     }
 }
 
+// ----------------------------------------------------------------------------
+// 6. DELETE ACCOUNT LOGIC
+// ----------------------------------------------------------------------------
+function confirmDeleteAccount() {
+    const modal = document.getElementById('deleteAccountModal');
+    if (modal) {
+        modal.classList.add('active');
+    }
+}
+
+function closeDeleteAccountModal() {
+    const modal = document.getElementById('deleteAccountModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+async function executeDeleteAccount() {
+    const btn = document.getElementById('btnConfirmDelete');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Deleting...';
+    }
+
+    const profile = getUserProfile();
+    const email = profile.email || '';
+    const roll = profile.roll || '';
+
+    // 1. Delete from Supabase Database & Auth if connected
+    if (typeof DatabaseService !== 'undefined') {
+        try {
+            await DatabaseService.deleteProfileAndAccount(email, roll);
+        } catch(e) {
+            console.error("Database account deletion error:", e);
+        }
+    }
+
+    // 2. Clear Local Storage sessions and registrations
+    if (email) {
+        localStorage.removeItem('safeCampusAuth_' + email.toLowerCase());
+    }
+    if (roll) {
+        localStorage.removeItem('safeCampusRegistered_' + roll.toLowerCase());
+    }
+    localStorage.removeItem('safeCampusUser');
+    localStorage.removeItem('safeCampusUserProfile');
+    localStorage.removeItem('safeCampusMyItems');
+    localStorage.removeItem('safeCampusHistory');
+    localStorage.removeItem('safeCampusRequestedItems');
+
+    showToast('Your account and profile have been permanently deleted.', 'info');
+
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 800);
+}
+
 function showToast(msg, type = 'info') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
