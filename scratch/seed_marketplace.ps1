@@ -3,14 +3,13 @@ $headers = @{
     "Authorization" = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndieWJlc2Z0ZGt1YnNxa3RlenB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MzIyMDQsImV4cCI6MjEwNzIwODIwNH0.FGkDJ1EezLnsi5XAiLmH6hWMWtXts68ui6rW0R_H8tE"
 };
 
-# 1. Delete all old rows
+# Delete all old rows
 try {
     Invoke-RestMethod -Uri "https://wbybesftdkubsqktezpy.supabase.co/rest/v1/marketplace_items?id=not.is.null" -Headers $headers -Method Delete
 } catch {}
 
-# 2. Define 30 items (6 items x 5 categories)
 $items = @(
-    # --- Electronics ---
+    # --- 1. Electronics ---
     @{
         title = "Casio FX-991CW Scientific Calculator"
         category = "Electronics"
@@ -57,7 +56,7 @@ $items = @(
         price = "₹300"
         condition = "Good"
         status = "available"
-        image_url = "item_headphones.jpg"
+        image_url = "item_mouse.jpg"
         seller_name = "Saurabh Mehta"
         seller_phone = "9876543120"
         seller_hostel = "Hostel No 21, Room 115"
@@ -70,7 +69,7 @@ $items = @(
         price = "₹950"
         condition = "Like New"
         status = "available"
-        image_url = "banner_gadgets.jpg"
+        image_url = "item_headphones.jpg"
         seller_name = "Kunal Roy"
         seller_phone = "9765432109"
         seller_hostel = "Hostel No 17, Room 402"
@@ -83,14 +82,14 @@ $items = @(
         price = "Free / Borrow"
         condition = "Good"
         status = "available"
-        image_url = "item_arduino_kit.jpg"
+        image_url = "item_raspberry_pi.jpg"
         seller_name = "Priya Nandan"
         seller_phone = "9432109876"
         seller_hostel = "Hostel No 14, Room 208"
         seller_roll = "21/IT/019"
     },
 
-    # --- Lab & Engineering ---
+    # --- 2. Lab & Engineering ---
     @{
         title = "White Cotton Lab Coat Size M"
         category = "Lab & Engineering"
@@ -124,7 +123,7 @@ $items = @(
         price = "₹150"
         condition = "Good"
         status = "available"
-        image_url = "item_mini_drafter.jpg"
+        image_url = "item_drawing_set.jpg"
         seller_name = "Deepak Raj"
         seller_phone = "9123459876"
         seller_hostel = "Hostel No 18, Room 210"
@@ -137,7 +136,7 @@ $items = @(
         price = "Free / Borrow"
         condition = "Like New"
         status = "available"
-        image_url = "item_lab_coat.jpg"
+        image_url = "item_goggles.jpg"
         seller_name = "Ananya Roy"
         seller_phone = "9456781234"
         seller_hostel = "Hostel No 11, Room 304"
@@ -150,7 +149,7 @@ $items = @(
         price = "₹250"
         condition = "Good"
         status = "available"
-        image_url = "item_mini_drafter.jpg"
+        image_url = "item_ranging_rod.jpg"
         seller_name = "Manish Tiwari"
         seller_phone = "9845123987"
         seller_hostel = "Hostel No 23, Room 106"
@@ -163,14 +162,14 @@ $items = @(
         price = "₹500"
         condition = "Good"
         status = "available"
-        image_url = "item_lab_coat.jpg"
+        image_url = "item_safety_shoes.jpg"
         seller_name = "Rishi Raj"
         seller_phone = "9765438901"
         seller_hostel = "Hostel No 22, Room 318"
         seller_roll = "22/PROD/014"
     },
 
-    # --- Books ---
+    # --- 3. Books ---
     @{
         title = "CLRS Introduction to Algorithms 4th Ed"
         category = "Books"
@@ -191,7 +190,7 @@ $items = @(
         price = "₹350"
         condition = "Good"
         status = "available"
-        image_url = "banner_books.jpg"
+        image_url = "item_maths_book.jpg"
         seller_name = "Aditya Sinha"
         seller_phone = "9437512345"
         seller_hostel = "Hostel No 15, Room 112"
@@ -204,7 +203,7 @@ $items = @(
         price = "Free / Borrow"
         condition = "Good"
         status = "available"
-        image_url = "banner_books.jpg"
+        image_url = "item_circuits_book.jpg"
         seller_name = "Rohit Verma"
         seller_phone = "9812345678"
         seller_hostel = "Hostel No 20, Room 204"
@@ -217,7 +216,7 @@ $items = @(
         price = "₹280"
         condition = "Good"
         status = "available"
-        image_url = "banner_books.jpg"
+        image_url = "item_thermo_book.jpg"
         seller_name = "Siddharth Mishra"
         seller_phone = "9765123480"
         seller_hostel = "Hostel No 16, Room 309"
@@ -230,7 +229,7 @@ $items = @(
         price = "Free / Borrow"
         condition = "Good"
         status = "available"
-        image_url = "item_clrs_book.jpg"
+        image_url = "item_networks_book.jpg"
         seller_name = "Ritu Rani"
         seller_phone = "9543126789"
         seller_hostel = "Hostel No 13, Room 101"
@@ -243,14 +242,14 @@ $items = @(
         price = "₹320"
         condition = "Good"
         status = "available"
-        image_url = "banner_books.jpg"
+        image_url = "item_clrs_book.jpg"
         seller_name = "Abhishek Kumar"
         seller_phone = "9876541230"
         seller_hostel = "Hostel No 19, Room 408"
         seller_roll = "21/CSE/091"
     },
 
-    # --- Mobility ---
+    # --- 4. Mobility ---
     @{
         title = "Hero Sprint 26T 21-Speed Gear Bicycle"
         category = "Mobility"
@@ -297,7 +296,7 @@ $items = @(
         price = "₹600"
         condition = "Good"
         status = "available"
-        image_url = "banner_community.jpg"
+        image_url = "item_table.jpg"
         seller_name = "Amit Singh"
         seller_phone = "9432198765"
         seller_hostel = "Hostel No 18, Room 102"
@@ -310,7 +309,7 @@ $items = @(
         price = "Free / Borrow"
         condition = "Good"
         status = "available"
-        image_url = "banner_community.jpg"
+        image_url = "item_table.jpg"
         seller_name = "Pooja Paul"
         seller_phone = "9876123450"
         seller_hostel = "Hostel No 10, Room 215"
@@ -330,7 +329,7 @@ $items = @(
         seller_roll = "22/EEE/081"
     },
 
-    # --- Others ---
+    # --- 5. Others ---
     @{
         title = "Stainless Steel Electric Kettle 1.8L"
         category = "Others"
@@ -364,7 +363,7 @@ $items = @(
         price = "Free / Borrow"
         condition = "Good"
         status = "available"
-        image_url = "banner_gadgets.jpg"
+        image_url = "item_kettle.jpg"
         seller_name = "Chandan Kumar"
         seller_phone = "9432890123"
         seller_hostel = "Hostel No 19, Room 104"
@@ -377,7 +376,7 @@ $items = @(
         price = "₹500"
         condition = "Good"
         status = "available"
-        image_url = "banner_community.jpg"
+        image_url = "item_table.jpg"
         seller_name = "Harsh Wardhan"
         seller_phone = "9876345120"
         seller_hostel = "Hostel No 23, Room 212"
@@ -390,7 +389,7 @@ $items = @(
         price = "₹220"
         condition = "Like New"
         status = "available"
-        image_url = "banner_gadgets.jpg"
+        image_url = "item_calculator.jpg"
         seller_name = "Aakash Verma"
         seller_phone = "9123450987"
         seller_hostel = "Hostel No 20, Room 316"
@@ -403,7 +402,7 @@ $items = @(
         price = "Free / Borrow"
         condition = "Good"
         status = "available"
-        image_url = "banner_community.jpg"
+        image_url = "item_table.jpg"
         seller_name = "Samir Ali"
         seller_phone = "9543901234"
         seller_hostel = "Hostel No 17, Room 105"
