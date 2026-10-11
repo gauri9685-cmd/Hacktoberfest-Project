@@ -223,21 +223,25 @@
             if (typeof DatabaseService !== 'undefined') {
                 const dbItems = await DatabaseService.getMarketplaceItems('all', query);
                 if (dbItems && dbItems.length > 0) {
-                    const mapped = dbItems.map(item => ({
-                        id: item.id,
-                        name: item.title,
-                        category: item.category,
-                        shortDesc: item.description || 'Campus student item',
-                        fullDesc: item.description || '',
-                        image: item.image_url || 'item_calculator.jpg',
-                        lenderName: item.seller_name || 'Campus Student',
-                        lenderHostel: item.seller_hostel || 'Hostel Campus',
-                        lenderRoom: 'Hostel Room',
-                        availabilityPeriod: item.price || 'Available',
-                        phone: item.seller_phone || '',
-                        email: 'student@bitsindri.ac.in',
-                        tags: [item.title.toLowerCase()]
-                    }));
+                    const mapped = dbItems.map(item => {
+                        const staticMatch = MARKETPLACE_DATABASE.find(s => s.name.toLowerCase() === item.title.toLowerCase());
+                        return {
+                            id: item.id,
+                            name: item.title,
+                            category: item.category,
+                            shortDesc: item.description || (staticMatch ? staticMatch.shortDesc : 'Campus student item'),
+                            fullDesc: item.description || (staticMatch ? staticMatch.fullDesc : ''),
+                            image: item.image_url || (staticMatch ? staticMatch.image : 'item_calculator.jpg'),
+                            lenderName: item.seller_name || (staticMatch ? staticMatch.lenderName : 'Campus Student'),
+                            lenderHostel: item.seller_hostel || (staticMatch ? staticMatch.lenderHostel : 'Hostel Campus'),
+                            lenderRoom: staticMatch ? staticMatch.lenderRoom : 'Hostel Room',
+                            availabilityPeriod: staticMatch ? staticMatch.availabilityPeriod : '5th Oct - 20th Oct',
+                            price: item.price || (staticMatch ? staticMatch.price : 'Free / Borrow'),
+                            phone: item.seller_phone || (staticMatch ? staticMatch.phone : ''),
+                            email: staticMatch ? staticMatch.email : 'student@bitsindri.ac.in',
+                            tags: [item.title.toLowerCase()]
+                        };
+                    });
                     allItems = [...mapped, ...MARKETPLACE_DATABASE];
                 }
             }
@@ -250,8 +254,15 @@
                 (item.tags && item.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase())))
             );
 
-            // Deduplicate by ID
-            const uniqueMatches = Array.from(new Map(matches.map(item => [item.id, item])).values());
+            // Deduplicate items by title to avoid duplicates
+            const uniqueMap = new Map();
+            matches.forEach(item => {
+                const key = item.name.trim().toLowerCase();
+                if (!uniqueMap.has(key)) {
+                    uniqueMap.set(key, item);
+                }
+            });
+            const uniqueMatches = Array.from(uniqueMap.values());
 
             document.getElementById('resultsCountBadge').innerText = `(${uniqueMatches.length} items found)`;
 
@@ -279,7 +290,7 @@
                                 <p class="item-card-desc">${escapeHTML(item.shortDesc)}</p>
                                 <div class="item-card-meta">
                                     <span class="item-lender-loc">📍 ${escapeHTML(item.lenderHostel)}</span>
-                                    <span>🗓️ ${escapeHTML(item.availabilityPeriod.split('-')[0].trim())}</span>
+                                    <span>🗓️ ${escapeHTML(item.availabilityPeriod)}</span>
                                 </div>
                             </div>
                             <div class="item-card-footer">

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="racketFrame" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg)"/>
+  
+  <g transform="rotate(-30 200 200)" filter="url(#shadow)">
+    <!-- Racket 1 (Blue) -->
+    <!-- Head Oval -->
+    <ellipse cx="170" cy="130" rx="45" ry="60" fill="none" stroke="url(#racketFrame)" stroke-width="8"/>
+    <!-- String Grid -->
+    <ellipse cx="170" cy="130" rx="41" ry="56" fill="#0284c7" fill-opacity="0.1" stroke="#38bdf8" stroke-width="0.5" stroke-dasharray="4,4"/>
+    <!-- Shaft -->
+    <line x1="170" y1="190" x2="170" y2="300" stroke="#cbd5e1" stroke-width="6"/>
+    <!-- Handle -->
+    <rect x="163" y="300" width="14" height="65" rx="3" fill="#1e293b" stroke="#0284c7" stroke-width="2"/>
+    <line x1="163" y1="315" x2="177" y2="315" stroke="#94a3b8" stroke-width="1.5"/>
+    <line x1="163" y1="330" x2="177" y2="330" stroke="#94a3b8" stroke-width="1.5"/>
+    <line x1="163" y1="345" x2="177" y2="345" stroke="#94a3b8" stroke-width="1.5"/>
+  </g>
+
+  <g transform="rotate(30 200 200)" filter="url(#shadow)">
+    <!-- Racket 2 (Red/Orange) -->
+    <!-- Head Oval -->
+    <ellipse cx="230" cy="130" rx="45" ry="60" fill="none" stroke="#f97316" stroke-width="8"/>
+    <!-- String Grid -->
+    <ellipse cx="230" cy="130" rx="41" ry="56" fill="#f97316" fill-opacity="0.1" stroke="#fb923c" stroke-width="0.5" stroke-dasharray="4,4"/>
+    <!-- Shaft -->
+    <line x1="230" y1="190" x2="230" y2="300" stroke="#cbd5e1" stroke-width="6"/>
+    <!-- Handle -->
+    <rect x="223" y="300" width="14" height="65" rx="3" fill="#1e293b" stroke="#f97316" stroke-width="2"/>
+  </g>
+
+  <!-- Shuttlecock -->
+  <g transform="translate(290, 240) rotate(45)">
+    <path d="M 0 0 L -15 -35 L 15 -35 Z" fill="#ffffff" opacity="0.9"/>
+    <circle cx="0" cy="5" r="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+    <line x1="-12" y1="-20" x2="12" y2="-20" stroke="#0284c7" stroke-width="2"/>
+  </g>
+
+  <text x="200" y="380" font-family="sans-serif" font-size="12" font-weight="bold" fill="#38bdf8" text-anchor="middle" letter-spacing="2">YONEX BADMINTON SET</text>
+</svg>

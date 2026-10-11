@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="metalTrunk" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="50%" stop-color="#64748b"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <linearGradient id="brass" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg)"/>
+
+  <g filter="url(#shadow)">
+    <!-- Main Trunk Box -->
+    <rect x="50" y="170" width="300" height="150" rx="8" fill="url(#metalTrunk)" stroke="#334155" stroke-width="4"/>
+    
+    <!-- Trunk Lid -->
+    <path d="M 45 170 L 65 125 L 335 125 L 355 170 Z" fill="#94a3b8" stroke="#334155" stroke-width="4"/>
+    
+    <!-- Metal Reinforcement Corners & Bands -->
+    <rect x="45" y="125" width="25" height="195" fill="#334155" opacity="0.6"/>
+    <rect x="330" y="125" width="25" height="195" fill="#334155" opacity="0.6"/>
+    <rect x="130" y="125" width="16" height="195" fill="#334155" opacity="0.5"/>
+    <rect x="254" y="125" width="16" height="195" fill="#334155" opacity="0.5"/>
+    
+    <!-- Rivets -->
+    <circle cx="57" cy="140" r="3" fill="#cbd5e1"/>
+    <circle cx="57" cy="185" r="3" fill="#cbd5e1"/>
+    <circle cx="57" cy="245" r="3" fill="#cbd5e1"/>
+    <circle cx="57" cy="305" r="3" fill="#cbd5e1"/>
+    <circle cx="343" cy="140" r="3" fill="#cbd5e1"/>
+    <circle cx="343" cy="185" r="3" fill="#cbd5e1"/>
+    <circle cx="343" cy="245" r="3" fill="#cbd5e1"/>
+    <circle cx="343" cy="305" r="3" fill="#cbd5e1"/>
+
+    <!-- Handles on Left and Right -->
+    <rect x="25" y="220" width="25" height="40" rx="6" fill="none" stroke="#1e293b" stroke-width="6"/>
+    <rect x="350" y="220" width="25" height="40" rx="6" fill="none" stroke="#1e293b" stroke-width="6"/>
+
+    <!-- Center Latch and Brass Padlock -->
+    <rect x="188" y="160" width="24" height="40" rx="3" fill="url(#brass)" stroke="#a16207" stroke-width="2"/>
+    <circle cx="200" cy="195" r="14" fill="url(#brass)" stroke="#a16207" stroke-width="2"/>
+    <path d="M 194 185 A 6 6 0 0 1 206 185 L 206 195 L 194 195 Z" fill="none" stroke="#475569" stroke-width="3"/>
+    <circle cx="200" cy="195" r="3" fill="#713f12"/>
+    <line x1="200" y1="198" x2="200" y2="203" stroke="#713f12" stroke-width="2"/>
+  </g>
+
+  <text x="200" y="360" font-family="sans-serif" font-size="12" font-weight="bold" fill="#94a3b8" text-anchor="middle" letter-spacing="2">STEEL HOSTEL STORAGE TRUNK</text>
+</svg>
