@@ -128,13 +128,22 @@ async function initUserSession() {
         } catch(e) {}
     }
 
-    const initial = (user && user.name) ? user.name.charAt(0).toUpperCase() : 'G';
-    
+    const circleBtn = document.querySelector('.hub-profile-circle-badge');
     const badge = document.getElementById('userInitialBadge');
-    if (badge) badge.innerText = initial;
-
     const frame36Badge = document.getElementById('frame36UserInitial');
-    if (frame36Badge) frame36Badge.innerText = initial;
+
+    if (user && user.photo) {
+        if (circleBtn) {
+            circleBtn.innerHTML = `<img src="${user.photo}" alt="${user.name ? user.name.replace(/"/g, '&quot;') : 'Profile'}" class="user-circle-avatar-img">`;
+        }
+        if (frame36Badge) {
+            frame36Badge.innerHTML = `<img src="${user.photo}" alt="${user.name ? user.name.replace(/"/g, '&quot;') : 'Profile'}" class="user-circle-avatar-img">`;
+        }
+    } else {
+        const initial = (user && user.name) ? user.name.charAt(0).toUpperCase() : 'G';
+        if (badge) badge.innerText = initial;
+        if (frame36Badge) frame36Badge.innerText = initial;
+    }
 }
 
 function goBackToHome() {

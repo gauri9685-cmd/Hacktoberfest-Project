@@ -140,12 +140,21 @@
     box-shadow: 0 0 18px rgba(217, 70, 239, 0.5) !important;
     transition: all 0.3s ease !important;
     padding: 0 !important;
+    overflow: hidden !important;
 }
 
 .profile-circle-btn.hub-profile-circle-badge:hover {
     box-shadow: 0 0 28px rgba(217, 70, 239, 0.9), 0 0 15px #00f0ff !important;
     border-color: #00f0ff !important;
     transform: scale(1.08) !important;
+}
+
+.profile-circle-btn.hub-profile-circle-badge img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    display: block !important;
 }
 
 /* -------------------------------------------------------------------------- */

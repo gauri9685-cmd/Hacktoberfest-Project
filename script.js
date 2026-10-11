@@ -70,7 +70,11 @@ async function updateUIAuthStatus() {
 
         // Logged in mode: Render Circular Profile icon button matching Desktop-2 / Wireframe
         const initial = (user.name && user.name.trim()) ? user.name.trim().charAt(0).toUpperCase() : 'G';
-        loginHeaderBtn.innerHTML = `<span class="user-circle-avatar" style="font-size: 1.2rem; font-weight: 900; line-height: 1;">${escapeHTML(initial)}</span>`;
+        if (user.photo) {
+            loginHeaderBtn.innerHTML = `<img src="${user.photo}" alt="${escapeHTML(user.name)}" class="user-circle-avatar-img">`;
+        } else {
+            loginHeaderBtn.innerHTML = `<span class="user-circle-avatar" style="font-size: 1.2rem; font-weight: 900; line-height: 1;">${escapeHTML(initial)}</span>`;
+        }
         loginHeaderBtn.className = 'btn-profile-circular';
         loginHeaderBtn.title = `Profile: ${escapeHTML(user.name)} (${escapeHTML(user.roll || '')})`;
         loginHeaderBtn.onclick = handleHeaderAuthClick;
@@ -227,6 +231,11 @@ async function processSignup() {
         }
     }
 
+    let signupPhotoBase64 = '';
+    if (selectedSignupPhotoBase64) {
+        signupPhotoBase64 = selectedSignupPhotoBase64;
+    }
+
     const userData = {
         name: name,
         roll: roll,
@@ -235,7 +244,7 @@ async function processSignup() {
         phone: phone || '',
         hostel: hostel || 'Hostel Campus',
         room: room || '',
-        photo: '',
+        photo: signupPhotoBase64,
         loggedInAt: new Date().toISOString()
     };
 
@@ -253,7 +262,10 @@ async function processSignup() {
 
     if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.innerText = 'REGISTER ACCOUNT'; }
 
-    // Update UI Header instantly with the first letter of name!
+    // Reset photo cache
+    selectedSignupPhotoBase64 = null;
+
+    // Update UI Header instantly with the photo or first letter of name!
     updateUIAuthStatus();
 
     closeAuthModal();
@@ -347,12 +359,62 @@ function switchAuthView(viewName) {
     }
 }
 
+let selectedSignupPhotoBase64 = null;
+
 function handlePhotoSelect(event) {
-    const file = event.target.files[0];
+    const file = event.target.files && event.target.files[0];
     const label = document.getElementById('photoLabel');
-    if (file && label) {
-        label.innerText = `✓ Selected: ${file.name}`;
+    if (!file) return;
+
+    if (label) {
+        label.innerText = `⏳ Loading: ${file.name}...`;
     }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            // Resize image to max 240x240 to store efficiently in localStorage and Supabase
+            const maxDim = 240;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > maxDim) {
+                    height = Math.round((height * maxDim) / width);
+                    width = maxDim;
+                }
+            } else {
+                if (height > maxDim) {
+                    width = Math.round((width * maxDim) / height);
+                    height = maxDim;
+                }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            selectedSignupPhotoBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+            if (label) {
+                label.innerHTML = `✓ Photo Ready: <span style="color:#00f0ff;">${escapeHTML(file.name)}</span>`;
+            }
+        };
+        img.onerror = function() {
+            selectedSignupPhotoBase64 = e.target.result;
+            if (label) {
+                label.innerText = `✓ Selected: ${file.name}`;
+            }
+        };
+        img.src = e.target.result;
+    };
+    reader.onerror = function() {
+        if (label) label.innerText = `⚠️ Failed to read photo`;
+    };
+    reader.readAsDataURL(file);
 }
 
 /* Toast Notifications */

@@ -609,14 +609,17 @@ async function initSellerDataFromURL() {
         } catch(e) {}
     }
 
-    // Sync header profile initial
+    // Sync header profile initial / photo
     let user = null;
     try {
         const stored = localStorage.getItem('safeCampusUser');
         if (stored) user = JSON.parse(stored);
     } catch(e) {}
+    const circleBtn = document.querySelector('.header-profile-zone .profile-circle-btn');
     const badge = document.getElementById('userInitialBadge');
-    if (badge) {
+    if (user && user.photo && circleBtn) {
+        circleBtn.innerHTML = `<img src="${user.photo}" alt="${user.name ? user.name.replace(/"/g, '&quot;') : 'Profile'}" class="user-circle-avatar-img">`;
+    } else if (badge) {
         badge.innerText = (user && user.name) ? user.name.charAt(0).toUpperCase() : 'G';
     }
 }

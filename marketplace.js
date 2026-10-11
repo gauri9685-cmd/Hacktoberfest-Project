@@ -606,8 +606,12 @@ async function initUserSession() {
         } catch(e) {}
     }
 
+    const circleBtn = document.getElementById('headerProfileCircle');
     const badge = document.getElementById('userInitialBadge');
-    if (badge) {
+
+    if (user && user.photo && circleBtn) {
+        circleBtn.innerHTML = `<img src="${user.photo}" alt="${user.name ? user.name.replace(/"/g, '&quot;') : 'Profile'}" class="user-circle-avatar-img">`;
+    } else if (badge) {
         if (user && user.name) {
             badge.innerText = user.name.charAt(0).toUpperCase();
         } else {

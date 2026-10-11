@@ -145,7 +145,8 @@ function getUserProfile() {
                 hostel: parsed.hostel || DEFAULT_PROFILE.hostel,
                 room: parsed.room || DEFAULT_PROFILE.room,
                 phone: parsed.phone || DEFAULT_PROFILE.phone,
-                email: parsed.email || DEFAULT_PROFILE.email
+                email: parsed.email || DEFAULT_PROFILE.email,
+                photo: parsed.photo || ''
             };
         }
     } catch(e) {}
@@ -167,8 +168,21 @@ function loadUserProfile() {
     document.getElementById('displayProfilePhone').innerText = profile.phone;
     document.getElementById('displayProfileEmail').innerText = profile.email;
 
-    const initial = (profile.name && profile.name.trim()) ? profile.name.trim().charAt(0).toUpperCase() : 'R';
-    document.getElementById('profileAvatarInitial').innerText = initial;
+    const avatarCircle = document.getElementById('profileAvatarLarge');
+    if (profile.photo && avatarCircle) {
+        avatarCircle.innerHTML = `
+            <img src="${profile.photo}" alt="${profile.name.replace(/"/g, '&quot;')}" class="user-circle-avatar-img">
+            <div class="avatar-online-dot"></div>
+        `;
+    } else {
+        const initial = (profile.name && profile.name.trim()) ? profile.name.trim().charAt(0).toUpperCase() : 'R';
+        if (avatarCircle) {
+            avatarCircle.innerHTML = `
+                <span id="profileAvatarInitial">${initial}</span>
+                <div class="avatar-online-dot"></div>
+            `;
+        }
+    }
 }
 
 function openEditProfileModal() {
