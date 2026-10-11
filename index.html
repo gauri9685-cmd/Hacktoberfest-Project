@@ -152,7 +152,8 @@
                 
                 <form onsubmit="event.preventDefault(); processSignup();">
                     <div class="form-group-cyber">
-                        <input type="email" id="signupEmail" placeholder="Enter email address" required autocomplete="email">
+                        <input type="email" id="signupEmail" placeholder="Campus Email (e.g. name@bitsindri.ac.in)" required autocomplete="email" pattern=".+@bitsindri\.ac\.in$" title="Please use your official BIT Sindri email ending in @bitsindri.ac.in">
+                        <span style="display: block; font-size: 0.72rem; color: #38bdf8; margin-top: 0.25rem; font-family: var(--font-body);">* Only students with official @bitsindri.ac.in email can register</span>
                     </div>
 
                     <div class="form-group-cyber">

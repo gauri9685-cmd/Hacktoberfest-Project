@@ -224,6 +224,18 @@ async function processSignup() {
         return;
     }
 
+    // Campus domain verification: Only allow BIT Sindri emails
+    const campusDomain = '@bitsindri.ac.in';
+    if (!email.toLowerCase().endsWith(campusDomain)) {
+        showToast(`⚠️ Registration restricted: Please use your campus email ending in ${campusDomain}`, 'info');
+        const emailInput = document.getElementById('signupEmail');
+        if (emailInput) {
+            emailInput.focus();
+            emailInput.style.borderColor = '#ef4444';
+        }
+        return;
+    }
+
     if (password.length < 6) {
         showToast('Password must be at least 6 characters.', 'info');
         return;
