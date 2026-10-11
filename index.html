@@ -120,18 +120,18 @@
             <button class="modal-close-btn" onclick="closeAuthModal()">&times;</button>
 
             <!-- ----------------------------------------------------------------- -->
-            <!-- VIEW A: LOG IN FORM (Matching Wireframe Frame 22)                  -->
+            <!-- VIEW A: LOG IN FORM (Email & Password via Supabase Auth)           -->
             <!-- ----------------------------------------------------------------- -->
             <div id="loginFormView" class="auth-view active">
                 <h2 class="auth-title">LOG IN</h2>
                 
                 <form onsubmit="event.preventDefault(); processLogin();">
                     <div class="form-group-cyber">
-                        <input type="text" id="loginName" placeholder="Enter name" required>
+                        <input type="email" id="loginEmail" placeholder="Enter email address" required autocomplete="email">
                     </div>
                     
                     <div class="form-group-cyber">
-                        <input type="text" id="loginRoll" placeholder="Enter roll no" required>
+                        <input type="password" id="loginPassword" placeholder="Enter password" required autocomplete="current-password">
                     </div>
 
                     <button type="submit" class="btn-auth-submit">LOG IN</button>
@@ -145,44 +145,47 @@
 
 
             <!-- ----------------------------------------------------------------- -->
-            <!-- VIEW B: SIGN UP / CREATE ACCOUNT FORM (Matching Wireframe Frame 23)-->
-            <!-- Fields: Full name, roll no, branch, email, phone, hostel, room     -->
+            <!-- VIEW B: SIGN UP / CREATE ACCOUNT FORM (Email, Password, Details)   -->
             <!-- ----------------------------------------------------------------- -->
             <div id="signupFormView" class="auth-view">
                 <h2 class="auth-title">CREATE ACCOUNT</h2>
                 
                 <form onsubmit="event.preventDefault(); processSignup();">
                     <div class="form-group-cyber">
+                        <input type="email" id="signupEmail" placeholder="Enter email address" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group-cyber">
+                        <input type="password" id="signupPassword" placeholder="Create password (min 6 chars)" minlength="6" required autocomplete="new-password">
+                    </div>
+
+                    <div class="form-group-cyber">
                         <input type="text" id="signupFullName" placeholder="Enter full name" required>
                     </div>
 
                     <div class="form-row-2">
                         <div class="form-group-cyber">
-                            <input type="text" id="signupRoll" placeholder="Enter roll no" required>
+                            <input type="text" id="signupRoll" placeholder="Roll No (Optional / Additional Info)">
                         </div>
                         <div class="form-group-cyber">
-                            <input type="text" id="signupBranch" placeholder="Enter branch" required>
+                            <input type="text" id="signupBranch" placeholder="Enter branch (e.g. IT, CSE, ECE)">
                         </div>
                     </div>
 
                     <div class="form-group-cyber">
-                        <input type="email" id="signupEmail" placeholder="Enter email address" required>
-                    </div>
-
-                    <div class="form-group-cyber">
-                        <input type="tel" id="signupPhone" placeholder="Enter phone number" required>
+                        <input type="tel" id="signupPhone" placeholder="Enter phone number">
                     </div>
 
                     <div class="form-row-2">
                         <div class="form-group-cyber">
-                            <input type="text" id="signupHostel" placeholder="Enter hostel number" required>
+                            <input type="text" id="signupHostel" placeholder="Enter hostel number">
                         </div>
                         <div class="form-group-cyber">
-                            <input type="text" id="signupRoom" placeholder="Enter room number" required>
+                            <input type="text" id="signupRoom" placeholder="Enter room number">
                         </div>
                     </div>
 
-                    <!-- Photo Upload Button as in Frame 23 -->
+                    <!-- Photo Upload Button -->
                     <div class="photo-upload-box" onclick="document.getElementById('photoInput').click()">
                         <span id="photoLabel">📷 Upload a photo</span>
                         <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="handlePhotoSelect(event)">

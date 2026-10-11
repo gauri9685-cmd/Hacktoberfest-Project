@@ -244,7 +244,7 @@ const DatabaseService = {
     },
 
     /**
-     * Get Student Profile by Roll Number ONLY (strict match for auth)
+     * Get Student Profile by Roll Number
      */
     async getProfile(rollNumber) {
         const client = getSupabaseClient();
@@ -252,7 +252,6 @@ const DatabaseService = {
 
         try {
             const cleanRoll = rollNumber.trim();
-            // Match ONLY by roll_number — strict exact match for auth
             const { data, error } = await client
                 .from('profiles')
                 .select('*')
@@ -268,6 +267,84 @@ const DatabaseService = {
         } catch (e) {
             console.error("Exception in getProfile:", e);
             return null;
+        }
+    },
+
+    /**
+     * Get Student Profile by Email Address
+     */
+    async getProfileByEmail(email) {
+        const client = getSupabaseClient();
+        if (!client || !email) return null;
+
+        try {
+            const cleanEmail = email.trim();
+            const { data, error } = await client
+                .from('profiles')
+                .select('*')
+                .ilike('email', cleanEmail)
+                .maybeSingle();
+
+            if (error) {
+                console.error("[SafeCampus] getProfileByEmail query error:", error.message);
+                return null;
+            }
+
+            return data || null;
+        } catch (e) {
+            console.error("Exception in getProfileByEmail:", e);
+            return null;
+        }
+    },
+
+    /**
+     * Supabase Auth: Sign Up with Email and Password
+     */
+    async signUpWithEmail(email, password, metadata = {}) {
+        const client = getSupabaseClient();
+        if (!client) return { error: { message: "Database not connected" } };
+
+        try {
+            const { data, error } = await client.auth.signUp({
+                email: email.trim(),
+                password: password,
+                options: {
+                    data: metadata
+                }
+            });
+            return { data, error };
+        } catch (e) {
+            return { error: e };
+        }
+    },
+
+    /**
+     * Supabase Auth: Sign In with Email and Password
+     */
+    async signInWithEmail(email, password) {
+        const client = getSupabaseClient();
+        if (!client) return { error: { message: "Database not connected" } };
+
+        try {
+            const { data, error } = await client.auth.signInWithPassword({
+                email: email.trim(),
+                password: password
+            });
+            return { data, error };
+        } catch (e) {
+            return { error: e };
+        }
+    },
+
+    /**
+     * Supabase Auth: Sign Out
+     */
+    async signOut() {
+        const client = getSupabaseClient();
+        if (client) {
+            try {
+                await client.auth.signOut();
+            } catch(e) {}
         }
     }
 };

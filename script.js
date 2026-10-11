@@ -117,43 +117,72 @@ function handlePortalClick(targetFeature, targetUrl) {
     }
 }
 
-/* Process Login Form Submission - ONLY ALLOW IF ACCOUNT ALREADY EXISTS */
+/* Process Login Form Submission - SUPABASE AUTH VIA EMAIL & PASSWORD */
 async function processLogin() {
-    const nameInput = document.getElementById('loginName').value.trim();
-    const rollInput = document.getElementById('loginRoll').value.trim();
+    const emailInput = document.getElementById('loginEmail') ? document.getElementById('loginEmail').value.trim() : '';
+    const passwordInput = document.getElementById('loginPassword') ? document.getElementById('loginPassword').value : '';
 
-    if (!nameInput || !rollInput) {
-        showToast('Please enter both your name and roll number.', 'info');
+    if (!emailInput || !passwordInput) {
+        showToast('Please enter both your email address and password.', 'info');
         return;
     }
 
     const btnSubmit = document.querySelector('#loginFormView button[type="submit"]');
     if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.innerText = 'Verifying...'; }
-    showToast('Verifying student account...', 'info');
+    showToast('Authenticating with Supabase...', 'info');
 
-    // 1. Check if profile exists in Supabase (primary source of truth)
-    let existingProfile = null;
+    let userData = null;
+    let authSuccess = false;
+
+    // 1. Authenticate with Supabase Auth (Email + Password)
     if (typeof DatabaseService !== 'undefined') {
-        existingProfile = await DatabaseService.getProfile(rollInput);
+        try {
+            const { data, error } = await DatabaseService.signInWithEmail(emailInput, passwordInput);
+            if (!error && data && data.user) {
+                authSuccess = true;
+                // Fetch linked student profile by email or user metadata
+                const dbProfile = await DatabaseService.getProfileByEmail(emailInput);
+                const meta = data.user.user_metadata || {};
+
+                userData = {
+                    id: data.user.id,
+                    name: (dbProfile && dbProfile.full_name) || meta.full_name || emailInput.split('@')[0],
+                    roll: (dbProfile && dbProfile.roll_number) || meta.roll_number || '',
+                    branch: (dbProfile && dbProfile.branch) || meta.branch || 'Engineering',
+                    email: data.user.email || emailInput,
+                    phone: (dbProfile && dbProfile.phone) || meta.phone || '',
+                    hostel: (dbProfile && dbProfile.hostel) || meta.hostel || 'Hostel Campus',
+                    room: (dbProfile && dbProfile.room_number) || meta.room || '',
+                    photo: (dbProfile && dbProfile.photo_url) || meta.photo_url || '',
+                    loggedInAt: new Date().toISOString()
+                };
+            } else if (error) {
+                console.warn("[Supabase Auth] Login notice:", error.message);
+            }
+        } catch(e) {
+            console.error("Supabase signin error:", e);
+        }
     }
 
-    // 2. Local offline fallback: ONLY check dedicated registration key matching exact roll number
-    // (Never use the active login session key safeCampusUser for authentication proof)
-    if (!existingProfile) {
+    // 2. Offline / Local fallback check if network issue or Supabase Auth offline
+    if (!authSuccess) {
         try {
-            const registeredData = localStorage.getItem('safeCampusRegistered_' + rollInput.toLowerCase());
-            if (registeredData) {
-                const reg = JSON.parse(registeredData);
-                if (reg && reg.roll && reg.roll.toLowerCase() === rollInput.toLowerCase()) {
-                    existingProfile = {
-                        full_name: reg.name,
-                        roll_number: reg.roll,
-                        branch: reg.branch,
+            const registeredKey = 'safeCampusAuth_' + emailInput.toLowerCase();
+            const storedReg = localStorage.getItem(registeredKey);
+            if (storedReg) {
+                const reg = JSON.parse(storedReg);
+                if (reg && reg.password === passwordInput) {
+                    authSuccess = true;
+                    userData = {
+                        name: reg.name,
+                        roll: reg.roll || '',
+                        branch: reg.branch || 'Engineering',
                         email: reg.email,
-                        phone: reg.phone,
-                        hostel: reg.hostel,
-                        room_number: reg.room,
-                        photo_url: reg.photo
+                        phone: reg.phone || '',
+                        hostel: reg.hostel || 'Hostel Campus',
+                        room: reg.room || '',
+                        photo: reg.photo || '',
+                        loggedInAt: new Date().toISOString()
                     };
                 }
             }
@@ -162,83 +191,56 @@ async function processLogin() {
 
     if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.innerText = 'LOG IN'; }
 
-    // 3. Strict Check: If no account found anywhere — block login!
-    if (!existingProfile) {
-        showToast(`⚠️ No account found with Roll No "${rollInput}". Please sign up first to create your account!`, 'info');
-        switchAuthView('signup');
-        const signupName = document.getElementById('signupFullName');
-        const signupRoll = document.getElementById('signupRoll');
-        if (signupName) signupName.value = nameInput;
-        if (signupRoll) signupRoll.value = rollInput;
+    // 3. Strict Check: If credentials don't match
+    if (!authSuccess || !userData) {
+        showToast('⚠️ Invalid email or password. Please check your credentials or Sign up!', 'info');
         return;
     }
 
-    // 4. Account found — load stored data and log in
-    const userData = {
-        name: existingProfile.full_name || nameInput,
-        roll: existingProfile.roll_number || rollInput,
-        branch: existingProfile.branch || 'Engineering',
-        email: existingProfile.email || `${rollInput.toLowerCase()}@bitsindri.ac.in`,
-        phone: existingProfile.phone || '',
-        hostel: existingProfile.hostel || 'Hostel Campus',
-        room: existingProfile.room_number || '',
-        photo: existingProfile.photo_url || '',
-        loggedInAt: new Date().toISOString()
-    };
-
+    // 4. Save Session
     UserAuthManager.setUser(userData);
     localStorage.setItem('safeCampusUserProfile', JSON.stringify(userData));
 
-    // Update UI instantly with first letter of name
+    // Update UI instantly with profile photo or initial
     updateUIAuthStatus();
 
     closeAuthModal();
     executePostAuthAction(userData.name);
 }
 
-/* Process Sign Up Form Submission - CREATE NEW ACCOUNT */
+/* Process Sign Up Form Submission - CREATE NEW ACCOUNT WITH EMAIL & PASSWORD */
 async function processSignup() {
-    const name = document.getElementById('signupFullName').value.trim();
-    const roll = document.getElementById('signupRoll').value.trim();
-    const branch = document.getElementById('signupBranch').value.trim();
     const email = document.getElementById('signupEmail').value.trim();
-    const phone = document.getElementById('signupPhone').value.trim();
-    const hostel = document.getElementById('signupHostel').value.trim();
-    const room = document.getElementById('signupRoom').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const name = document.getElementById('signupFullName').value.trim();
+    const roll = document.getElementById('signupRoll') ? document.getElementById('signupRoll').value.trim() : '';
+    const branch = document.getElementById('signupBranch') ? document.getElementById('signupBranch').value.trim() : '';
+    const phone = document.getElementById('signupPhone') ? document.getElementById('signupPhone').value.trim() : '';
+    const hostel = document.getElementById('signupHostel') ? document.getElementById('signupHostel').value.trim() : '';
+    const room = document.getElementById('signupRoom') ? document.getElementById('signupRoom').value.trim() : '';
 
-    if (!name || !roll || !email) {
-        showToast('Please fill in your name, roll number, and email.', 'info');
+    if (!email || !password || !name) {
+        showToast('Please provide your Email, Password, and Full Name.', 'info');
+        return;
+    }
+
+    if (password.length < 6) {
+        showToast('Password must be at least 6 characters.', 'info');
         return;
     }
 
     const btnSubmit = document.querySelector('#signupFormView button[type="submit"]');
     if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.innerText = 'Creating...'; }
-    showToast('Creating your student account...', 'info');
-
-    // 1. Check if an account already exists with this Roll Number
-    const supabaseReady = (typeof DatabaseService !== 'undefined' && typeof supabaseClient !== 'undefined' && supabaseClient !== null);
-    if (supabaseReady) {
-        const checkExisting = await DatabaseService.getProfile(roll);
-        if (checkExisting) {
-            if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.innerText = 'REGISTER ACCOUNT'; }
-            showToast(`An account with Roll No "${roll}" already exists! Please log in instead.`, 'info');
-            switchAuthView('login');
-            const loginRoll = document.getElementById('loginRoll');
-            const loginName = document.getElementById('loginName');
-            if (loginRoll) loginRoll.value = roll;
-            if (loginName) loginName.value = checkExisting.full_name || name;
-            return;
-        }
-    }
+    showToast('Creating account with Supabase...', 'info');
 
     let signupPhotoBase64 = '';
     if (selectedSignupPhotoBase64) {
         signupPhotoBase64 = selectedSignupPhotoBase64;
     }
 
-    const userData = {
+    const profilePayload = {
         name: name,
-        roll: roll,
+        roll: roll || '', // Roll number is optional additional information
         branch: branch || 'Engineering',
         email: email,
         phone: phone || '',
@@ -248,24 +250,59 @@ async function processSignup() {
         loggedInAt: new Date().toISOString()
     };
 
-    // Save session (current login)
-    UserAuthManager.setUser(userData);
-    localStorage.setItem('safeCampusUserProfile', JSON.stringify(userData));
-
-    // Save dedicated registration record (keyed by roll number — used as offline login fallback)
-    localStorage.setItem('safeCampusRegistered_' + roll.toLowerCase(), JSON.stringify(userData));
-
-    // Save to Supabase Database
+    // 1. Supabase Auth Sign Up
+    const supabaseReady = (typeof DatabaseService !== 'undefined' && typeof supabaseClient !== 'undefined' && supabaseClient !== null);
     if (supabaseReady) {
-        await DatabaseService.saveProfile(userData);
+        try {
+            const { data, error } = await DatabaseService.signUpWithEmail(email, password, {
+                full_name: name,
+                roll_number: roll,
+                branch: branch,
+                phone: phone,
+                hostel: hostel,
+                room_number: room,
+                photo_url: signupPhotoBase64
+            });
+
+            if (error) {
+                // If user already registered, alert them
+                if (error.message && error.message.toLowerCase().includes('already registered')) {
+                    if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.innerText = 'REGISTER ACCOUNT'; }
+                    showToast('This email is already registered! Please log in.', 'info');
+                    switchAuthView('login');
+                    const loginEmail = document.getElementById('loginEmail');
+                    if (loginEmail) loginEmail.value = email;
+                    return;
+                }
+                console.warn("[Supabase Auth] SignUp notice:", error.message);
+            }
+
+            // Save / sync profile to profiles table
+            await DatabaseService.saveProfile(profilePayload);
+        } catch(err) {
+            console.error("Supabase signup error:", err);
+        }
     }
+
+    // 2. Save local cached registration & active login session
+    localStorage.setItem('safeCampusAuth_' + email.toLowerCase(), JSON.stringify({
+        ...profilePayload,
+        password: password
+    }));
+
+    if (roll) {
+        localStorage.setItem('safeCampusRegistered_' + roll.toLowerCase(), JSON.stringify(profilePayload));
+    }
+
+    UserAuthManager.setUser(profilePayload);
+    localStorage.setItem('safeCampusUserProfile', JSON.stringify(profilePayload));
 
     if (btnSubmit) { btnSubmit.disabled = false; btnSubmit.innerText = 'REGISTER ACCOUNT'; }
 
     // Reset photo cache
     selectedSignupPhotoBase64 = null;
 
-    // Update UI Header instantly with the photo or first letter of name!
+    // Update UI Header instantly with the photo or initial!
     updateUIAuthStatus();
 
     closeAuthModal();
